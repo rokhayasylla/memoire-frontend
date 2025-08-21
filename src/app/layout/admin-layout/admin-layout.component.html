@@ -1,0 +1,296 @@
+<!-- Loading State -->
+<div *ngIf="isLoading" class="fixed inset-0 bg-white flex items-center justify-center z-50">
+  <div class="text-center">
+    <div class="w-16 h-16 border-4 border-orange-200 border-t-orange-600 rounded-full animate-spin mx-auto mb-4"></div>
+    <p class="text-gray-600">Vérification de l'authentification...</p>
+  </div>
+</div>
+
+<!-- Main Content -->
+<div *ngIf="!isLoading" class="flex h-screen bg-gray-50">
+  <!-- Sidebar -->
+  <div class="w-64 bg-white shadow-lg flex flex-col">
+    <!-- Header -->
+    <div class="p-6 border-b border-gray-200">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 bg-gradient-to-r from-orange-400 to-amber-400 rounded-full flex items-center justify-center">
+          <i class="fas fa-bread-slice text-white"></i>
+        </div>
+        <div>
+          <h1 class="text-xl font-bold text-gray-900">Boulangerie</h1>
+          <p class="text-sm text-gray-500">Administration</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- User Info -->
+    <div class="p-4 border-b border-gray-200" *ngIf="currentUser">
+      <div class="flex items-center space-x-3">
+        <div class="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
+          <i class="fas fa-user text-orange-600 text-sm"></i>
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-medium text-gray-900 truncate">{{ currentUser.full_name }}</p>
+          <p class="text-xs text-gray-500 capitalize">{{ currentUser.role }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="flex-1 p-4 space-y-2">
+      <button
+        *ngFor="let item of menuItems"
+        (click)="setActiveTab(item.key)"
+        [class]="getMenuItemClass(item.key)"
+        class="w-full flex items-center space-x-3 px-4 py-3 text-left rounded-lg transition-all duration-200 hover:bg-gray-50"
+      >
+        <i [class]="item.icon + ' w-5 text-center'"></i>
+        <span class="font-medium">{{ item.label }}</span>
+      </button>
+    </nav>
+
+    <!-- Logout Button -->
+    <div class="p-4 border-t border-gray-200">
+      <button
+        (click)="logout()"
+        class="w-full flex items-center space-x-3 px-4 py-3 text-left rounded-lg text-red-600 hover:bg-red-50 transition-all duration-200"
+      >
+        <i class="fas fa-sign-out-alt w-5 text-center"></i>
+        <span class="font-medium">Déconnexion</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="flex-1 flex flex-col overflow-hidden">
+    <!-- Header -->
+    <div class="bg-white shadow-sm border-b border-gray-200 p-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-2xl font-bold text-gray-900">{{ getActiveTabTitle() }}</h2>
+          <p class="text-gray-600 mt-1">{{ getActiveTabDescription() }}</p>
+        </div>
+        <div class="flex items-center space-x-4">
+          <!-- Refresh Button for Dashboard -->
+          <button
+            *ngIf="activeTab === 'dashboard'"
+            (click)="loadDashboardStats()"
+            [disabled]="loadingStats"
+            class="p-2 text-gray-400 hover:text-gray-600 transition-colors disabled:opacity-50"
+            title="Actualiser les données"
+          >
+            <i class="fas fa-sync-alt" [class.fa-spin]="loadingStats"></i>
+          </button>
+
+          <!-- Notifications -->
+          <button class="relative p-2 text-gray-400 hover:text-gray-600 transition-colors">
+            <i class="fas fa-bell text-xl"></i>
+            <span class="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full"></span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content Area -->
+    <div class="flex-1 overflow-auto">
+      <div class="p-6">
+        <!-- Users Content -->
+        <div *ngIf="activeTab === 'users'">
+          <app-user-management></app-user-management>
+        </div>
+
+        <!-- Products Content -->
+        <div *ngIf="activeTab === 'products'">
+          <app-products-categories-management></app-products-categories-management>
+        </div>
+
+        <!-- Packs Content -->
+        <div *ngIf="activeTab === 'packs'">
+          <app-packs-management></app-packs-management>
+        </div>
+
+        <!-- Promotions Content -->
+        <div *ngIf="activeTab === 'promotions'">
+          <app-promotions-management></app-promotions-management>
+        </div>
+
+        <!-- Orders Content -->
+        <div *ngIf="activeTab === 'orders'">
+          <app-orders-management></app-orders-management>
+        </div>
+
+        <!-- Statistics Content -->
+        <div *ngIf="activeTab === 'statistics'">
+          <app-statistics-dashboard></app-statistics-dashboard>
+        </div>
+
+        <!-- Default Dashboard -->
+        <div *ngIf="activeTab === 'dashboard'" class="space-y-6">
+          <!-- Loading State for Stats -->
+          <div *ngIf="loadingStats" class="text-center py-8">
+            <div class="w-16 h-16 border-4 border-orange-200 border-t-orange-600 rounded-full animate-spin mx-auto mb-4"></div>
+            <p class="text-gray-600">Chargement des statistiques...</p>
+          </div>
+
+          <!-- Quick Stats -->
+          <div *ngIf="!loadingStats && dashboardStats" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Utilisateurs -->
+            <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-sm font-medium text-gray-600">Utilisateurs</p>
+                  <p class="text-3xl font-bold text-gray-900">{{ dashboardStats.usersCount }}</p>
+                  <p class="text-xs text-gray-500 mt-1">Total des comptes</p>
+                </div>
+                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <i class="fas fa-users text-blue-600"></i>
+                </div>
+              </div>
+            </div>
+
+            <!-- Produits -->
+            <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-sm font-medium text-gray-600">Produits</p>
+                  <p class="text-3xl font-bold text-gray-900">{{ dashboardStats.productsCount }}</p>
+                  <p class="text-xs text-gray-500 mt-1">
+                    <span *ngIf="dashboardStats.lowStockProducts.length > 0" class="text-red-500">
+                      {{ dashboardStats.lowStockProducts.length }} en stock faible
+                    </span>
+                    <span *ngIf="dashboardStats.lowStockProducts.length === 0" class="text-green-500">
+                      Stock optimal
+                    </span>
+                  </p>
+                </div>
+                <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                  <i class="fas fa-box text-green-600"></i>
+                </div>
+              </div>
+            </div>
+
+            <!-- Commandes -->
+            <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-sm font-medium text-gray-600">Commandes</p>
+                  <p class="text-3xl font-bold text-gray-900">{{ dashboardStats.ordersCount }}</p>
+                  <p class="text-xs text-gray-500 mt-1">Total des commandes</p>
+                </div>
+                <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                  <i class="fas fa-shopping-cart text-orange-600"></i>
+                </div>
+              </div>
+            </div>
+
+            <!-- Revenue -->
+            <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-sm font-medium text-gray-600">Chiffre d'affaires</p>
+                  <p class="text-3xl font-bold text-gray-900">{{ formatCurrency(dashboardStats.totalRevenue) }}</p>
+                  <p class="text-xs text-gray-500 mt-1">Commandes livrées</p>
+                </div>
+                <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                  <i class="fas fa-coins text-purple-600"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Additional Stats Row -->
+          <div *ngIf="!loadingStats && dashboardStats" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Promotions et Packs -->
+            <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
+              <h3 class="text-lg font-semibold text-gray-900 mb-4">Offres actives</h3>
+              <div class="space-y-3">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center space-x-2">
+                    <i class="fas fa-tags text-red-500"></i>
+                    <span class="text-sm text-gray-600">Promotions actives</span>
+                  </div>
+                  <span class="text-lg font-semibold text-gray-900">{{ dashboardStats.activePromotions }}</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center space-x-2">
+                    <i class="fas fa-cubes text-blue-500"></i>
+                    <span class="text-sm text-gray-600">Packs disponibles</span>
+                  </div>
+                  <span class="text-lg font-semibold text-gray-900">{{ dashboardStats.activePacks }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Produits en stock faible -->
+            <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
+              <h3 class="text-lg font-semibold text-gray-900 mb-4">Alertes stock</h3>
+              <div *ngIf="dashboardStats.lowStockProducts.length === 0" class="text-center py-4">
+                <i class="fas fa-check-circle text-green-500 text-2xl mb-2"></i>
+                <p class="text-sm text-gray-600">Tous les produits ont un stock suffisant</p>
+              </div>
+              <div *ngIf="dashboardStats.lowStockProducts.length > 0" class="space-y-2 max-h-32 overflow-y-auto">
+                <div *ngFor="let product of dashboardStats.lowStockProducts"
+                     class="flex items-center justify-between p-2 bg-yellow-50 rounded-lg">
+                  <span class="text-sm text-gray-900 truncate">{{ product.name }}</span>
+                  <span [class]="getStockStatusClass(product.stock_quantity)"
+                        class="px-2 py-1 rounded-full text-xs font-medium">
+                    {{ product.stock_quantity }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Orders -->
+          <div *ngIf="!loadingStats && dashboardStats && dashboardStats.recentOrders.length > 0"
+               class="bg-white rounded-xl shadow-sm border border-gray-200">
+            <div class="px-6 py-4 border-b border-gray-200">
+              <h3 class="text-lg font-semibold text-gray-900">Commandes récentes</h3>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">N° Commande</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Client</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Montant</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Statut</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                <tr *ngFor="let order of dashboardStats.recentOrders" class="hover:bg-gray-50">
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    {{ order.order_number }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                    {{ order.user?.full_name || 'Client inconnu' }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
+                    {{ formatCurrency(order.total_amount) }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                      <span [class]="getOrderStatusClass(order.status)"
+                            class="px-2 py-1 rounded-full text-xs font-medium">
+                        {{ getOrderStatusLabel(order.status) }}
+                      </span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                    {{ order.created_at | date:'dd/MM/yyyy HH:mm' }}
+                  </td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Welcome Message -->
+          <div class="bg-gradient-to-r from-orange-500 to-amber-500 rounded-xl p-8 text-white">
+            <h3 class="text-2xl font-bold mb-2">Bienvenue, {{ currentUser?.full_name }}!</h3>
+            <p class="text-orange-100">Gérez votre boulangerie efficacement avec notre plateforme complète.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

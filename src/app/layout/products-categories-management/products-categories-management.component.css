@@ -1,0 +1,145 @@
+/* Style pour la troncature du texte */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Animation pour les modals */
+.modal-backdrop {
+  backdrop-filter: blur(4px);
+}
+
+/* Style pour les inputs de fichier */
+input[type="file"]::-webkit-file-upload-button {
+  @apply bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 text-sm cursor-pointer hover:bg-gray-100 transition-colors duration-200;
+}
+
+/* Style pour les boutons d'action */
+.action-button {
+  @apply p-2 rounded-lg transition-all duration-200 hover:shadow-md;
+}
+
+/* Style pour les cartes produits */
+.product-card {
+  @apply transform transition-all duration-200 hover:scale-105 hover:shadow-lg;
+}
+
+/* Style pour les badges de statut */
+.status-badge {
+  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+}
+
+/* Animation de chargement */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: .5;
+  }
+}
+
+.loading-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Style pour les messages d'erreur */
+.error-message {
+  @apply bg-red-50 border-l-4 border-red-400 p-4 rounded-lg;
+}
+
+/* Style pour les messages de succès */
+.success-message {
+  @apply bg-green-50 border-l-4 border-green-400 p-4 rounded-lg;
+}
+
+/* Style responsive pour les grilles */
+@media (max-width: 768px) {
+  .grid-responsive {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 768px) {
+  .grid-responsive {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .grid-responsive {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* Style pour les tooltips */
+.tooltip {
+  @apply absolute z-10 px-2 py-1 text-xs text-white bg-gray-900 rounded-lg opacity-0 pointer-events-none transition-opacity duration-300;
+}
+
+.tooltip-trigger:hover .tooltip {
+  @apply opacity-100;
+}
+
+/* Style pour les séparateurs */
+.divider {
+  @apply border-t border-gray-200 my-6;
+}
+
+/* Style pour les états vides */
+.empty-state {
+  @apply text-center py-12 text-gray-500;
+}
+
+.empty-state-icon {
+  @apply mx-auto h-12 w-12 text-gray-400 mb-4;
+}
+
+/* Style pour les formulaires */
+.form-group {
+  @apply mb-4;
+}
+
+.form-label {
+  @apply block text-sm font-medium text-gray-700 mb-2;
+}
+
+.form-input {
+  @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-orange-500 focus:border-orange-500 transition-colors duration-200;
+}
+
+.form-textarea {
+  @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-orange-500 focus:border-orange-500 resize-none transition-colors duration-200;
+}
+
+.form-select {
+  @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-orange-500 focus:border-orange-500 bg-white transition-colors duration-200;
+}
+
+/* Style pour les boutons */
+.btn-primary {
+  @apply bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+.btn-secondary {
+  @apply bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-2 rounded-lg font-medium transition-colors duration-200;
+}
+
+.btn-danger {
+  @apply bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200;
+}
+
+/* Style pour les onglets */
+.tab-button {
+  @apply whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm transition-colors duration-200 cursor-pointer;
+}
+
+.tab-active {
+  @apply border-orange-500 text-orange-600 bg-orange-50;
+}
+
+.tab-inactive {
+  @apply border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300;
+}

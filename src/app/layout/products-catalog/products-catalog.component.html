@@ -1,0 +1,339 @@
+<!-- Error Message -->
+<div *ngIf="error" class="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
+  <div class="flex">
+    <div class="flex-shrink-0">
+      <i class="fas fa-exclamation-circle text-red-400"></i>
+    </div>
+    <div class="ml-3 flex-1">
+      <div class="text-sm text-red-800">{{ error }}</div>
+    </div>
+    <div class="ml-auto pl-3">
+      <button (click)="error = null" class="text-red-400 hover:text-red-600">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="flex gap-6">
+  <!-- Sidebar Filters -->
+  <div class="w-64 bg-white rounded-lg shadow-sm border border-gray-200 p-6 h-fit">
+    <h3 class="text-lg font-semibold text-gray-900 mb-4">Filtres</h3>
+
+    <!-- Search -->
+    <div class="mb-6">
+      <label class="block text-sm font-medium text-gray-700 mb-2">Rechercher</label>
+      <input
+        type="text"
+        [(ngModel)]="searchTerm"
+        (input)="onSearchChange()"
+        placeholder="Nom du produit..."
+        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-orange-500 focus:border-orange-500"
+      >
+    </div>
+
+    <!-- Category Filter - Correction: changement de value en string -->
+    <div class="mb-6">
+      <label class="block text-sm font-medium text-gray-700 mb-2">Catégorie</label>
+      <select
+        [(ngModel)]="selectedCategory"
+        (change)="onCategoryChange()"
+        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-orange-500 focus:border-orange-500"
+      >
+        <option value="0">Toutes les catégories</option>
+        <option *ngFor="let category of categories" [value]="category.id.toString()">
+          {{ category.name }}
+        </option>
+      </select>
+    </div>
+
+    <!-- Price Range -->
+    <div class="mb-6">
+      <label class="block text-sm font-medium text-gray-700 mb-2">Prix (XOF)</label>
+      <div class="space-y-2">
+        <input
+          type="range"
+          [(ngModel)]="priceRange.min"
+          (input)="onPriceRangeChange()"
+          min="0"
+          max="10000"
+          step="100"
+          class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+        >
+        <input
+          type="range"
+          [(ngModel)]="priceRange.max"
+          (input)="onPriceRangeChange()"
+          min="0"
+          max="10000"
+          step="100"
+          class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+        >
+        <div class="flex justify-between text-sm text-gray-600">
+          <span>{{ priceRange.min }} XOF</span>
+          <span>{{ priceRange.max }} XOF</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Promotions Filter -->
+    <div class="mb-6">
+      <label class="flex items-center">
+        <input
+          type="checkbox"
+          [(ngModel)]="showPromotionsOnly"
+          (change)="onPromotionFilterChange()"
+          class="rounded border-gray-300 text-orange-600 focus:ring-orange-500"
+        >
+        <span class="ml-2 text-sm font-medium text-gray-700">Promotions uniquement</span>
+      </label>
+    </div>
+  </div>
+
+  <!-- Products Grid -->
+  <div class="flex-1">
+    <!-- Header with results count -->
+    <div class="mb-6">
+      <h2 class="text-xl font-semibold text-gray-900">
+        Catalogue Produits
+        <span class="text-sm font-normal text-gray-500">
+          ({{ filteredProducts.length }} produit{{ filteredProducts.length > 1 ? 's' : '' }})
+        </span>
+      </h2>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="text-center py-12">
+      <i class="fas fa-spinner fa-spin text-3xl text-gray-400 mb-4"></i>
+      <p class="text-gray-500">Chargement des produits...</p>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!loading && filteredProducts.length === 0" class="text-center py-12">
+      <i class="fas fa-search text-3xl text-gray-400 mb-4"></i>
+      <p class="text-gray-500">Aucun produit trouvé</p>
+      <button
+        (click)="selectedCategory = '0'; searchTerm = ''; showPromotionsOnly = false; applyFilters()"
+        class="mt-4 text-orange-600 hover:text-orange-700 font-medium"
+      >
+        Réinitialiser les filtres
+      </button>
+    </div>
+
+    <!-- Products Grid -->
+    <div *ngIf="!loading && filteredProducts.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div *ngFor="let product of filteredProducts; trackBy: trackByProductId" class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow duration-200 product-card">
+        <!-- Promotion Badge -->
+        <div *ngIf="isProductInPromotion(product)" class="relative">
+          <div class="absolute top-2 left-2 z-10">
+            <span class="bg-red-500 text-white px-2 py-1 rounded-full text-xs font-semibold promo-badge">
+              <span *ngIf="getProductPromotion(product)?.discount_percentage">
+                -{{ getProductPromotion(product)?.discount_percentage }}%
+              </span>
+              <span *ngIf="getProductPromotion(product)?.discount_amount">
+                -{{ getProductPromotion(product)?.discount_amount }} XOF
+              </span>
+            </span>
+          </div>
+        </div>
+
+        <!-- Product Image -->
+        <div class="h-48 bg-gray-100 overflow-hidden">
+          <img
+            *ngIf="getProductImageUrl(product)"
+            [src]="getProductImageUrl(product)"
+            [alt]="product.name"
+            class="w-full h-full object-cover"
+            (error)="onImageError($event)"
+          >
+          <div *ngIf="!getProductImageUrl(product)" class="w-full h-full flex items-center justify-center">
+            <i class="fas fa-image text-4xl text-gray-300"></i>
+          </div>
+        </div>
+
+        <!-- Product Info -->
+        <div class="p-4">
+          <!-- Product Name -->
+          <h3 class="font-semibold text-gray-900 mb-2 truncate" [title]="product.name">
+            {{ truncateText(product.name, 30) }}
+          </h3>
+
+          <!-- Category Badge -->
+          <div class="mb-2">
+            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+              {{ getCategoryName(product.category_id) }}
+            </span>
+          </div>
+
+          <!-- Product Description -->
+          <p class="text-sm text-gray-600 mb-3 line-clamp-2" [title]="product.description">
+            {{ truncateText(product.description || '', 80) }}
+          </p>
+
+          <!-- Price -->
+          <div class="mb-4">
+            <div *ngIf="isProductInPromotion(product)" class="flex items-center space-x-2">
+              <span class="text-lg font-bold text-orange-600">
+                {{ getPromotionPrice(product) | number:'1.0-2' }} XOF
+              </span>
+              <span class="text-sm text-gray-500 line-through">
+                {{ product.price | number:'1.0-2' }} XOF
+              </span>
+            </div>
+            <div *ngIf="!isProductInPromotion(product)">
+              <span class="text-lg font-bold text-gray-900">
+                {{ product.price | number:'1.0-2' }} XOF
+              </span>
+            </div>
+          </div>
+
+          <!-- Stock Status -->
+          <div class="mb-4">
+            <span
+              *ngIf="product.stock_quantity > 0"
+              class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800"
+            >
+              En stock ({{ product.stock_quantity }})
+            </span>
+            <span
+              *ngIf="product.stock_quantity === 0"
+              class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800"
+            >
+              Rupture de stock
+            </span>
+          </div>
+
+          <!-- Actions -->
+          <div class="flex items-center justify-between">
+            <button
+              (click)="addToCart(product)"
+              [disabled]="product.stock_quantity === 0"
+              class="bg-orange-600 hover:bg-orange-700 disabled:bg-gray-300 text-white p-2 rounded-lg transition-colors duration-200"
+              [title]="product.stock_quantity === 0 ? 'Produit non disponible' : 'Ajouter au panier'"
+            >
+              <i class="fas fa-shopping-cart"></i>
+            </button>
+
+            <button
+              (click)="openProductModal(product)"
+              class="text-gray-600 hover:text-orange-600 p-2 rounded-lg hover:bg-gray-50 transition-colors duration-200"
+              title="Voir les détails"
+            >
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Product Details Modal -->
+<div *ngIf="showProductModal && selectedProduct" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 modal-overlay">
+  <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto custom-scrollbar">
+    <div class="px-6 py-4 border-b border-gray-200">
+      <div class="flex items-center justify-between">
+        <h3 class="text-lg font-medium text-gray-900">Détails du produit</h3>
+        <button (click)="closeProductModal()" class="text-gray-400 hover:text-gray-600">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="px-6 py-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Product Image -->
+        <div class="aspect-square bg-gray-100 rounded-lg overflow-hidden relative">
+          <!-- Promotion Badge -->
+          <div *ngIf="isProductInPromotion(selectedProduct)" class="absolute top-2 left-2 z-10">
+            <span class="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold promo-badge">
+              <span *ngIf="getProductPromotion(selectedProduct)?.discount_percentage">
+                -{{ getProductPromotion(selectedProduct)?.discount_percentage }}%
+              </span>
+              <span *ngIf="getProductPromotion(selectedProduct)?.discount_amount">
+                -{{ getProductPromotion(selectedProduct)?.discount_amount }} XOF
+              </span>
+            </span>
+          </div>
+
+          <img
+            *ngIf="getProductImageUrl(selectedProduct)"
+            [src]="getProductImageUrl(selectedProduct)"
+            [alt]="selectedProduct.name"
+            class="w-full h-full object-cover"
+          >
+          <div *ngIf="!getProductImageUrl(selectedProduct)" class="w-full h-full flex items-center justify-center">
+            <i class="fas fa-image text-6xl text-gray-300"></i>
+          </div>
+        </div>
+
+        <!-- Product Details -->
+        <div class="space-y-4">
+          <div>
+            <h4 class="text-xl font-semibold text-gray-900 mb-2">{{ selectedProduct.name }}</h4>
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-orange-100 text-orange-800">
+              {{ getCategoryName(selectedProduct.category_id) }}
+            </span>
+          </div>
+
+          <!-- Price -->
+          <div>
+            <div *ngIf="isProductInPromotion(selectedProduct)" class="flex items-center space-x-3">
+              <span class="text-2xl font-bold text-orange-600">
+                {{ getPromotionPrice(selectedProduct) | number:'1.0-2' }} XOF
+              </span>
+              <span class="text-lg text-gray-500 line-through">
+                {{ selectedProduct.price | number:'1.0-2' }} XOF
+              </span>
+            </div>
+            <div *ngIf="!isProductInPromotion(selectedProduct)">
+              <span class="text-2xl font-bold text-gray-900">
+                {{ selectedProduct.price | number:'1.0-2' }} XOF
+              </span>
+            </div>
+          </div>
+
+          <!-- Stock -->
+          <div>
+            <span
+              *ngIf="selectedProduct.stock_quantity > 0"
+              class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800"
+            >
+              En stock ({{ selectedProduct.stock_quantity }} unités)
+            </span>
+            <span
+              *ngIf="selectedProduct.stock_quantity === 0"
+              class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800"
+            >
+              Rupture de stock
+            </span>
+          </div>
+
+          <!-- Description -->
+          <div *ngIf="selectedProduct.description">
+            <h5 class="font-medium text-gray-900 mb-1">Description</h5>
+            <p class="text-gray-600">{{ selectedProduct.description }}</p>
+          </div>
+
+          <!-- Allergens -->
+          <div *ngIf="selectedProduct.allergens">
+            <h5 class="font-medium text-gray-900 mb-1">Allergènes</h5>
+            <p class="text-gray-600">{{ selectedProduct.allergens }}</p>
+          </div>
+
+          <!-- Add to Cart Button -->
+          <div class="pt-4">
+            <button
+              (click)="addToCart(selectedProduct); closeProductModal()"
+              [disabled]="selectedProduct.stock_quantity === 0"
+              class="w-full bg-orange-600 hover:bg-orange-700 disabled:bg-gray-300 text-white py-3 px-4 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center space-x-2"
+            >
+              <i class="fas fa-shopping-cart"></i>
+              <span>{{ selectedProduct.stock_quantity === 0 ? 'Produit non disponible' : 'Ajouter au panier' }}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
