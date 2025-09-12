@@ -74,50 +74,65 @@ export class CartModalComponent implements OnInit {
   }
 
   placeOrder(): void {
-    if (!this.checkoutForm.delivery_address.trim()) {
-      this.error = 'L\'adresse de livraison est obligatoire';
-      return;
-    }
-
-    this.loading = true;
-    this.error = null;
-
-    // Préparer les items pour la commande (seulement les produits)
-    const orderItems = this.cartItems
-      .filter(item => item.product_id) // Seulement les produits
-      .map(item => ({
-        product_id: item.product_id!,
-        quantity: item.quantity
-      }));
-
-    if (orderItems.length === 0) {
-      this.error = 'Aucun produit dans le panier';
-      this.loading = false;
-      return;
-    }
-
-    const orderData: CreateOrderRequest = {
-      items: orderItems,
-      delivery_address: this.checkoutForm.delivery_address.trim(),
-      payment_method: this.checkoutForm.payment_method as 'cash_on_delivery' | 'online',
-      notes: this.checkoutForm.notes.trim() || undefined
-    };
-
-    this.orderService.createOrder(orderData).subscribe({
-      next: (order) => {
-        // Vider le panier après commande réussie
-        this.cartService.clearAllCart();
-        alert('Commande passée avec succès !');
-        this.closeModal.emit();
-        this.loading = false;
-      },
-      error: (error) => {
-        this.error = 'Erreur lors de la création de la commande';
-        this.loading = false;
-        console.error('Error creating order:', error);
-      }
-    });
+  if (!this.checkoutForm.delivery_address.trim()) {
+    this.error = 'L\'adresse de livraison est obligatoire';
+    return;
   }
+
+  this.loading = true;
+  this.error = null;
+
+  // CORRECTION : Préparer les items pour la commande (produits ET packs)
+  const orderItems: any[] = [];
+  
+  this.cartItems.forEach(item => {
+    // Si c'est un produit
+    if (item.product_id) {
+      orderItems.push({
+        product_id: item.product_id,
+        quantity: item.quantity
+      });
+    }
+    // Si c'est un pack
+    else if (item.pack_id) {
+      orderItems.push({
+        pack_id: item.pack_id,
+        quantity: item.quantity
+      });
+    }
+  });
+
+  console.log('Items à commander:', orderItems);
+  console.log('Items du panier:', this.cartItems);
+
+  if (orderItems.length === 0) {
+    this.error = 'Aucun article valide dans le panier';
+    this.loading = false;
+    return;
+  }
+
+  const orderData: CreateOrderRequest = {
+    items: orderItems,
+    delivery_address: this.checkoutForm.delivery_address.trim(),
+    payment_method: this.checkoutForm.payment_method as 'cash_on_delivery' | 'online',
+    notes: this.checkoutForm.notes.trim() || undefined
+  };
+
+  this.orderService.createOrder(orderData).subscribe({
+    next: (order) => {
+      // Vider le panier après commande réussie
+      this.cartService.clearAllCart();
+      alert('Commande passée avec succès !');
+      this.closeModal.emit();
+      this.loading = false;
+    },
+    error: (error) => {
+      this.error = 'Erreur lors de la création de la commande';
+      this.loading = false;
+      console.error('Erreur création commande:', error);
+    }
+  });
+}
 
   close(): void {
     this.closeModal.emit();

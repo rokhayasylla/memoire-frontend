@@ -1,1 +1,317 @@
-<p>statistics-dashboard works!</p>
+<!-- Container principal -->
+<div class="min-h-screen bg-gray-50 py-6">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    
+    <!-- En-tête -->
+    <div class="mb-8">
+      <!-- <h1 class="text-3xl font-bold text-gray-900">📊 Tableau de Bord Statistiques par Jour</h1> -->
+      <p class="mt-2 text-gray-600">Analyse quotidienne complète de l'évolution de vos commandes</p>
+    </div>
+
+    <!-- Filtre de mois -->
+    <div class="bg-white rounded-lg shadow mb-6 p-6">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
+        <h2 class="text-lg font-medium text-gray-900 flex items-center">
+          <i class="fas fa-calendar-alt text-orange-600 mr-2"></i>
+          Filtre par Mois
+        </h2>
+        <div class="flex items-center space-x-4">
+          <label for="month-select" class="text-sm font-medium text-gray-700">
+            Sélectionner un mois :
+          </label>
+          <select
+            id="month-select"
+            [(ngModel)]="selectedMonth"
+            (change)="onMonthChange()"
+            class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-orange-500 focus:border-orange-500 bg-white min-w-[200px]"
+          >
+            <option *ngFor="let month of availableMonths" [value]="month.value">
+              {{ month.label }}
+            </option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Indicateur de chargement -->
+    <div *ngIf="loading" class="text-center py-12">
+      <div class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-orange-700 bg-orange-100">
+        <i class="fas fa-spinner fa-spin mr-3"></i>
+        Chargement des statistiques...
+      </div>
+    </div>
+
+    <!-- Message d'erreur -->
+    <div *ngIf="error" class="bg-red-50 border border-red-200 rounded-lg p-6 mb-6">
+      <div class="flex items-center">
+        <i class="fas fa-exclamation-triangle text-red-400 mr-3"></i>
+        <p class="text-red-800">{{ error }}</p>
+        <button (click)="loadStatistics()" class="ml-auto px-4 py-2 text-sm bg-red-600 text-white rounded hover:bg-red-700">
+          Réessayer
+        </button>
+      </div>
+    </div>
+
+    <!-- Contenu principal -->
+    <div *ngIf="!loading && !error && currentMonthStats" class="space-y-8">
+      
+      <!-- Métriques du mois sélectionné -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Total Commandes -->
+        <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg shadow-lg p-6 text-white">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <div class="w-12 h-12 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
+                <i class="fas fa-shopping-cart text-xl"></i>
+              </div>
+            </div>
+            <div class="ml-4">
+              <p class="text-blue-100 text-sm font-medium">Total Commandes</p>
+              <p class="text-3xl font-bold">{{ formatNumber(currentMonthStats.totalOrders) }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chiffre d'affaires -->
+        <div class="bg-gradient-to-r from-green-500 to-green-600 rounded-lg shadow-lg p-6 text-white">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <div class="w-12 h-12 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
+                <i class="fas fa-coins text-xl"></i>
+              </div>
+            </div>
+            <div class="ml-4">
+              <p class="text-green-100 text-sm font-medium">Chiffre d'Affaires</p>
+              <p class="text-2xl font-bold">{{ formatCurrency(currentMonthStats.totalRevenue) }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Articles Vendus -->
+        <div class="bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg shadow-lg p-6 text-white">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <div class="w-12 h-12 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
+                <i class="fas fa-boxes text-xl"></i>
+              </div>
+            </div>
+            <div class="ml-4">
+              <p class="text-purple-100 text-sm font-medium">Articles Vendus</p>
+              <p class="text-3xl font-bold">{{ formatNumber(currentMonthStats.totalItems) }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Panier Moyen -->
+        <div class="bg-gradient-to-r from-orange-500 to-orange-600 rounded-lg shadow-lg p-6 text-white">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <div class="w-12 h-12 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
+                <i class="fas fa-chart-line text-xl"></i>
+              </div>
+            </div>
+            <div class="ml-4">
+              <p class="text-orange-100 text-sm font-medium">Panier Moyen</p>
+              <p class="text-2xl font-bold">{{ formatCurrency(currentMonthStats.averageOrderValue) }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Diagrammes -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        
+        <!-- Graphique d'évolution quotidienne (30 derniers jours) -->
+        <div class="bg-white rounded-lg shadow-lg p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+              <i class="fas fa-chart-line text-blue-600 mr-2"></i>
+              Évolution Quotidienne
+            </h3>
+          </div>
+          <div class="relative" style="height: 400px;">
+            <canvas #dailyChart></canvas>
+          </div>
+        </div>
+
+        <!-- Graphique en anneau - Répartition par jour de la semaine -->
+        <div class="bg-white rounded-lg shadow-lg p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+              <i class="fas fa-chart-pie text-green-600 mr-2"></i>
+              Répartition par Jour de la Semaine
+            </h3>
+          </div>
+          <div class="relative" style="height: 400px;">
+            <canvas #donutChart></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Graphique d'évolution mensuelle -->
+      <div class="bg-white rounded-lg shadow-lg p-6">
+        <div class="flex items-center justify-between mb-6">
+          <h3 class="text-xl font-semibold text-gray-900 flex items-center">
+            <i class="fas fa-chart-bar text-orange-600 mr-2"></i>
+            Évolution Mensuelle des Ventes
+          </h3>
+        </div>
+        <div class="relative" style="height: 400px;">
+          <canvas #monthlyChart></canvas>
+        </div>
+      </div>
+
+      <!-- Tableau récapitulatif par jour -->
+      <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+          <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+            <i class="fas fa-table text-purple-600 mr-2"></i>
+            Historique Quotidien Détaillé
+          </h3>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-100">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <i class="fas fa-calendar mr-1"></i> Date
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <i class="fas fa-shopping-cart mr-1"></i> Commandes
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <i class="fas fa-coins mr-1"></i> CA (XOF)
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <i class="fas fa-calculator mr-1"></i> CA par Commande
+                </th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              <tr 
+                *ngFor="let day of dailyStats.slice(-15); trackBy: trackByDay" 
+                class="hover:bg-gray-50 transition-colors duration-200"
+              >
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm font-medium text-gray-900">{{ day.dayLabel }}</div>
+                  <div class="text-xs text-gray-500">{{ day.day }}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <span class="text-sm font-medium text-gray-900">{{ formatNumber(day.orders) }}</span>
+                    <div class="ml-2 w-16 bg-gray-200 rounded-full h-2" *ngIf="getMaxDailyOrders() > 0">
+                      <div class="bg-blue-500 h-2 rounded-full" [style.width.%]="(day.orders / getMaxDailyOrders()) * 100"></div>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm font-medium text-gray-900">{{ formatCurrency(day.revenue) }}</div>
+                  <div class="w-20 bg-gray-200 rounded-full h-1.5 mt-1" *ngIf="getMaxDailyRevenue() > 0">
+                    <div class="bg-green-500 h-1.5 rounded-full" [style.width.%]="(day.revenue / getMaxDailyRevenue()) * 100"></div>
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span class="text-sm font-medium text-gray-900">
+                    {{ day.orders > 0 ? formatCurrency(day.revenue / day.orders) : '0 XOF' }}
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Statistiques supplémentaires -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Tendance quotidienne -->
+        <div class="bg-white rounded-lg shadow-lg p-6">
+          <h4 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+            <i class="fas fa-trending-up text-blue-600 mr-2"></i>
+            Tendance Quotidienne
+          </h4>
+          <div class="space-y-3">
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-gray-600">Évolution commandes :</span>
+              <span class="text-sm font-medium" [class.text-green-600]="getDailyTrend('orders') > 0" [class.text-red-600]="getDailyTrend('orders') < 0" [class.text-gray-600]="getDailyTrend('orders') === 0">
+                <i class="fas fa-arrow-up" *ngIf="getDailyTrend('orders') > 0"></i>
+                <i class="fas fa-arrow-down" *ngIf="getDailyTrend('orders') < 0"></i>
+                <i class="fas fa-minus" *ngIf="getDailyTrend('orders') === 0"></i>
+                {{ getDailyTrend('orders') > 0 ? '+' : '' }}{{ getDailyTrend('orders').toFixed(1) }}%
+              </span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-gray-600">Évolution CA :</span>
+              <span class="text-sm font-medium" [class.text-green-600]="getDailyTrend('revenue') > 0" [class.text-red-600]="getDailyTrend('revenue') < 0" [class.text-gray-600]="getDailyTrend('revenue') === 0">
+                <i class="fas fa-arrow-up" *ngIf="getDailyTrend('revenue') > 0"></i>
+                <i class="fas fa-arrow-down" *ngIf="getDailyTrend('revenue') < 0"></i>
+                <i class="fas fa-minus" *ngIf="getDailyTrend('revenue') === 0"></i>
+                {{ getDailyTrend('revenue') > 0 ? '+' : '' }}{{ getDailyTrend('revenue').toFixed(1) }}%
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Meilleur jour -->
+        <div class="bg-white rounded-lg shadow-lg p-6">
+          <h4 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+            <i class="fas fa-star text-yellow-500 mr-2"></i>
+            Meilleur Jour
+          </h4>
+          <div class="space-y-3">
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-gray-600">Date :</span>
+              <span class="text-sm font-medium text-gray-900">{{ getBestDay().day }}</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-gray-600">Commandes :</span>
+              <span class="text-sm font-medium text-blue-600">{{ getBestDay().orders }}</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-gray-600">Revenus :</span>
+              <span class="text-sm font-medium text-green-600">{{ formatCurrency(getBestDay().revenue) }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Moyennes globales -->
+        <div class="bg-white rounded-lg shadow-lg p-6">
+          <h4 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+            <i class="fas fa-calculator text-purple-600 mr-2"></i>
+            Moyennes Globales
+          </h4>
+          <div class="space-y-3">
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-gray-600">Commandes/jour :</span>
+              <span class="text-sm font-medium text-gray-900">{{ getGlobalAverages().ordersPerDay }}</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-gray-600">CA/jour :</span>
+              <span class="text-sm font-medium text-gray-900">{{ formatCurrency(getGlobalAverages().revenuePerDay) }}</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-gray-600">Panier moyen :</span>
+              <span class="text-sm font-medium text-gray-900">{{ formatCurrency(getGlobalAverages().averageOrderValue) }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Message si aucune donnée -->
+    <div *ngIf="!loading && !error && dailyStats.length === 0" class="text-center py-16">
+      <div class="w-24 h-24 mx-auto mb-6 bg-gray-100 rounded-full flex items-center justify-center">
+        <i class="fas fa-chart-line text-4xl text-gray-400"></i>
+      </div>
+      <h3 class="text-xl font-semibold text-gray-900 mb-2">Aucune donnée disponible</h3>
+      <p class="text-gray-500 mb-6">Passez votre première commande pour voir les statistiques s'afficher</p>
+      <button 
+        (click)="loadStatistics()" 
+        class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
+      >
+        <i class="fas fa-refresh mr-2"></i>
+        Actualiser
+      </button>
+    </div>
+  </div>
+</div>

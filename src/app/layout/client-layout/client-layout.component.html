@@ -76,6 +76,72 @@
               </button>
             </div>
           </div>
+          
+
+
+
+
+<!-- ========== BOUTON CHAT À AJOUTER  ========== -->
+<button 
+  (click)="openChatModal()" 
+  class="relative inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors duration-200">
+  <!-- Icône message -->
+  <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+          d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z">
+    </path>
+  </svg>
+  Messages
+  <!-- Badge pour les messages non lus -->
+  <span *ngIf="unreadMessageCount > 0" 
+        class="absolute -top-2 -right-2 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-500 rounded-full animate-pulse">
+    {{ unreadMessageCount }}
+  </span>
+</button>
+
+<!-- ========== MODAL CHAT À AJOUTER ========== -->
+<div *ngIf="showChatModal" 
+     class="fixed inset-0 z-50 overflow-y-auto" 
+     (click)="closeChatModal()">
+  <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+    <!-- Overlay -->
+    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
+    
+    <!-- Modal Content -->
+    <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full" 
+         (click)="$event.stopPropagation()">
+      
+      <!-- Header du modal -->
+      <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-medium text-gray-900">
+            Messages - Support Client
+          </h3>
+          <button 
+            (click)="closeChatModal()"
+            class="text-gray-400 hover:text-gray-600 transition-colors">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+        
+        <!-- Composant Chat intégré -->
+        <div class="h-96">
+          <app-clientchat></app-clientchat>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+          
 
           <!-- Cart -->
           <button
@@ -101,7 +167,9 @@
           </button>
         </div>
       </div>
+      <div class="client-content"></div>
     </div>
+
   </nav>
 
   <!-- Click outside to close user menu -->

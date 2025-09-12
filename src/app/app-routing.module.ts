@@ -13,6 +13,11 @@ import {PromotionsManagementComponent} from "./layout/promotions-management/prom
 import {clientGuard} from "./guard/client.guard";
 import {ClientLayoutComponent} from "./layout/client-layout/client-layout.component";
 import {RegisterComponent} from "./layout/register/register.component";
+import { EmployeeLayoutComponent } from './layout/employee-layout/employee-layout.component';
+import { employeeGuard } from './guard/employee.guard';
+import { EmployeeDeliveriesComponent } from './layout/employee-deliveries/employee-deliveries.component';
+import { EmployeeOrdersComponent } from './layout/employee-orders/employee-orders.component';
+import { EmployeeSupportComponent } from './layout/employee-support/employee-support.component';
 
 const routes: Routes = [
   {
@@ -39,6 +44,11 @@ const routes: Routes = [
     canActivate: [authGuard,clientGuard]
   },
   {
+    path: 'employee',
+    component: EmployeeLayoutComponent,
+    canActivate: [authGuard, employeeGuard]
+  },
+  {
     path: 'product-category-management',
     component: ProductsCategoriesManagementComponent
   },
@@ -54,6 +64,20 @@ const routes: Routes = [
     path: 'promo-management',
     component: PromotionsManagementComponent
   },
+
+  {
+    path: 'employee-deliveries',
+    component: EmployeeDeliveriesComponent
+  },
+  {
+    path: 'employee-orders',
+    component: EmployeeOrdersComponent
+  },
+  {
+    path: 'employee-support',
+    component: EmployeeSupportComponent
+  },
+
 ];
 
 @NgModule({

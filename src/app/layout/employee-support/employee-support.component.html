@@ -1,0 +1,182 @@
+<!-- employee-support.component.html -->
+<div class="h-full bg-gray-50 flex">
+  <!-- Liste des conversations -->
+  <div class="w-1/3 bg-white border-r border-gray-200 flex flex-col">
+    <!-- Header -->
+    <div class="p-4 border-b border-gray-200 bg-gradient-to-r from-orange-500 to-amber-500 text-white">
+      <h2 class="text-lg font-semibold flex items-center">
+        <i class="fas fa-headset mr-2"></i>
+        Support Client
+      </h2>
+      <p class="text-sm text-orange-100 mt-1">{{ conversations.length }} conversation(s)</p>
+    </div>
+
+    <!-- Loading state -->
+    <div *ngIf="loadingConversations" class="flex-1 flex items-center justify-center">
+      <div class="text-center">
+        <div class="w-8 h-8 border-2 border-orange-200 border-t-orange-500 rounded-full animate-spin mx-auto mb-2"></div>
+        <p class="text-gray-500 text-sm">Chargement...</p>
+      </div>
+    </div>
+
+    <!-- Liste des conversations -->
+    <div *ngIf="!loadingConversations" class="flex-1 overflow-y-auto">
+      <div *ngIf="conversations.length === 0" class="p-4 text-center text-gray-500">
+        <i class="fas fa-comments text-4xl mb-3 text-gray-300"></i>
+        <p>Aucune conversation</p>
+      </div>
+
+      <div *ngFor="let conversation of conversations" 
+           (click)="selectConversation(conversation)"
+           class="p-4 border-b border-gray-100 cursor-pointer hover:bg-gray-50 transition-colors"
+           [class.bg-orange-50]="selectedConversation?.user_id === conversation.user_id"
+           [class.border-l-4]="selectedConversation?.user_id === conversation.user_id"
+           [class.border-l-orange-500]="selectedConversation?.user_id === conversation.user_id">
+        
+        <div class="flex items-start justify-between">
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center space-x-2">
+              <h3 class="font-medium text-gray-900 truncate">
+                {{ conversation.user.full_name }}
+              </h3>
+              <span *ngIf="conversation.unread_count > 0" 
+                    class="bg-red-500 text-white text-xs rounded-full px-2 py-0.5 font-bold">
+                {{ conversation.unread_count }}
+              </span>
+            </div>
+            <p class="text-sm text-gray-600 truncate mt-1">
+              {{ conversation.user.email }}
+            </p>
+            <p class="text-sm text-gray-500 truncate mt-2">
+              {{ conversation.latest_message?.message || 'Aucun message' }}
+            </p>
+          </div>
+          <div class="text-xs text-gray-400 ml-2">
+            {{ conversation.latest_message?.created_at ? formatMessageTime(conversation.latest_message.created_at) : '' }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="p-4 border-t border-gray-200 bg-gray-50">
+      <button (click)="loadConversations()" 
+              [disabled]="loadingConversations"
+              class="w-full bg-orange-500 hover:bg-orange-600 disabled:bg-gray-300 text-white py-2 px-4 rounded-lg transition-colors text-sm">
+        <i class="fas fa-sync-alt mr-2" [class.fa-spin]="loadingConversations"></i>
+        Actualiser
+      </button>
+    </div>
+  </div>
+
+  <!-- Zone de chat -->
+  <div class="flex-1 flex flex-col">
+    <!-- Header conversation -->
+    <div *ngIf="selectedConversation" 
+         class="p-4 border-b border-gray-200 bg-white flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
+          <i class="fas fa-user text-orange-600"></i>
+        </div>
+        <div>
+          <h3 class="font-semibold text-gray-900">{{ selectedConversation.user.full_name }}</h3>
+          <p class="text-sm text-gray-500">{{ selectedConversation.user.email }}</p>
+        </div>
+      </div>
+      <button (click)="loadMessages(selectedConversation.user_id)"
+              [disabled]="loadingMessages"
+              class="p-2 text-gray-400 hover:text-gray-600 transition-colors">
+        <i class="fas fa-sync-alt" [class.fa-spin]="loadingMessages"></i>
+      </button>
+    </div>
+
+    <!-- Messages -->
+    <div class="flex-1 overflow-y-auto p-4 bg-gray-50" id="messagesContainer">
+      <div *ngIf="!selectedConversation" 
+           class="h-full flex items-center justify-center text-gray-500">
+        <div class="text-center">
+          <i class="fas fa-comments text-6xl mb-4 text-gray-300"></i>
+          <h3 class="text-xl font-medium mb-2">Sélectionnez une conversation</h3>
+          <p>Choisissez une conversation dans la liste pour commencer à répondre</p>
+        </div>
+      </div>
+
+      <div *ngIf="loadingMessages" class="text-center py-8">
+        <div class="w-8 h-8 border-2 border-orange-200 border-t-orange-500 rounded-full animate-spin mx-auto mb-2"></div>
+        <p class="text-gray-500">Chargement des messages...</p>
+      </div>
+
+      <div *ngIf="selectedConversation && !loadingMessages" class="space-y-4">
+        <div *ngFor="let message of messages" 
+             class="flex"
+             [class.justify-end]="message.sender_type === 'support'"
+             [class.justify-start]="message.sender_type === 'client'">
+          
+          <div class="max-w-md">
+            <!-- Nom de l'expéditeur -->
+            <div class="text-xs text-gray-500 mb-1"
+                 [class.text-right]="message.sender_type === 'support'">
+              {{ message.sender_type === 'support' ? 'Support' : (selectedConversation.user.full_name || 'Client') }}
+            </div>
+            
+            <!-- Bulle de message -->
+            <div class="px-4 py-2 rounded-lg"
+                 [class.bg-orange-500]="message.sender_type === 'support'"
+                 [class.text-white]="message.sender_type === 'support'"
+                 [class.bg-white]="message.sender_type === 'client'"
+                 [class.text-gray-800]="message.sender_type === 'client'"
+                 [class.shadow-sm]="message.sender_type === 'client'">
+              
+              <p class="text-sm">{{ message.message }}</p>
+              <p class="text-xs mt-1 opacity-70">
+                {{ formatMessageTime(message.created_at) }}
+                <span *ngIf="message.sender_type === 'support' && message.is_read" class="ml-1">✓</span>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="messages.length === 0" 
+             class="text-center py-8 text-gray-500">
+          <p>Aucun message dans cette conversation</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Zone de saisie -->
+    <div *ngIf="selectedConversation" 
+         class="p-4 bg-white border-t border-gray-200">
+      <form (ngSubmit)="sendReply()" class="flex space-x-3">
+        <div class="flex-1">
+          <textarea
+            [(ngModel)]="replyMessage"
+            name="reply"
+            placeholder="Tapez votre réponse..."
+            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-orange-500 resize-none"
+            rows="3"
+            [disabled]="sendingReply"
+            maxlength="1000">
+          </textarea>
+          <div class="text-xs text-gray-500 mt-1 text-right">
+            {{ replyMessage.length }}/1000
+          </div>
+        </div>
+        <div class="flex flex-col space-y-2">
+          <button
+            type="submit"
+            [disabled]="!replyMessage.trim() || sendingReply"
+            class="bg-orange-500 hover:bg-orange-600 disabled:bg-gray-300 text-white rounded-lg px-4 py-2 transition-colors">
+            <i class="fas fa-paper-plane" [class.fa-spin]="sendingReply"></i>
+          </button>
+          <button
+            type="button"
+            (click)="replyMessage = ''"
+            [disabled]="!replyMessage || sendingReply"
+            class="bg-gray-300 hover:bg-gray-400 disabled:bg-gray-200 text-gray-700 rounded-lg px-4 py-2 transition-colors">
+            <i class="fas fa-trash text-sm"></i>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

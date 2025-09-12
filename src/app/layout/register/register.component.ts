@@ -16,6 +16,13 @@ export class RegisterComponent implements OnInit {
   showConfirmPassword = false;
   submitted = false;
 
+  // Options de rôles
+  roleOptions = [
+    { value: 'client', label: 'Client', description: 'Passer des commandes et gérer mon compte', icon: 'fas fa-user' },
+    { value: 'employee', label: 'Employé', description: 'Gérer les commandes et livraisons', icon: 'fas fa-user-tie' },
+    { value: 'admin', label: 'Administrateur', description: 'Gestion complète de la boulangerie', icon: 'fas fa-user-shield' }
+  ];
+
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
@@ -26,6 +33,7 @@ export class RegisterComponent implements OnInit {
       email: ['', [Validators.required, Validators.email]],
       phone: [''],
       address: [''],
+      role: ['client', Validators.required], // Rôle par défaut : client
       password: ['', [Validators.required, Validators.minLength(8)]],
       password_confirmation: ['', Validators.required]
     }, { validators: this.passwordMatchValidator });
@@ -74,8 +82,8 @@ export class RegisterComponent implements OnInit {
       this.authService.register(formData).subscribe({
         next: (response) => {
           this.isLoading = false;
-          // Rediriger vers la page client après inscription réussie
-          this.router.navigate(['/client']);
+          // Rediriger selon le rôle choisi
+          this.redirectBasedOnRole(formData.role);
         },
         error: (error) => {
           this.isLoading = false;
@@ -104,6 +112,22 @@ export class RegisterComponent implements OnInit {
           console.log(`${key}:`, control.errors);
         }
       });
+    }
+  }
+
+  // Redirection basée sur le rôle
+  private redirectBasedOnRole(role: string): void {
+    switch (role) {
+      case 'admin':
+        this.router.navigate(['/admin']);
+        break;
+      case 'employee':
+        this.router.navigate(['/employee']);
+        break;
+      case 'client':
+      default:
+        this.router.navigate(['/client']);
+        break;
     }
   }
 
@@ -146,6 +170,7 @@ export class RegisterComponent implements OnInit {
     const messages: { [key: string]: string } = {
       full_name: 'Le nom complet est requis',
       email: 'L\'email est requis',
+      role: 'Le rôle est requis',
       password: 'Le mot de passe est requis',
       password_confirmation: 'La confirmation du mot de passe est requise'
     };

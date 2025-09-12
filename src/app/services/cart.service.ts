@@ -130,18 +130,26 @@ export class CartService {
   }
 
   // Ajouter pack et rafraîchir avec message de succès
-  addPackToCart(pack: Pack, quantity: number = 1): void {
-    this.addPack(pack.id, quantity).subscribe({
-      next: () => {
-        this.refreshCart();
-        this.showSuccessMessage(`${pack.name} ajouté au panier avec succès !`);
-      },
-      error: (error) => {
-        console.error('Error adding pack to cart:', error);
-        this.showErrorMessage('Erreur lors de l\'ajout au panier');
-      }
-    });
+addPackToCart(pack: Pack, quantity: number = 1): void {
+  if (!pack.id) {
+    console.error('Pack ID is missing!');
+    return;
   }
+
+  const payload = { pack_id: pack.id, quantity: quantity };
+  console.log('Payload sent to backend:', payload);
+
+  this.http.post<CartItem>(`${this.apiUrl}/cart/add-pack`, payload).subscribe({
+    next: () => {
+      this.refreshCart();
+      this.showSuccessMessage(`${pack.name} ajouté au panier avec succès !`);
+    },
+    error: (error) => {
+      console.error('Error adding pack to cart:', error);
+      this.showErrorMessage('Erreur lors de l\'ajout au panier');
+    }
+  });
+}
 
   // Afficher message d'erreur
   private showErrorMessage(message: string): void {

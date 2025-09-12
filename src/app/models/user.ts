@@ -47,3 +47,22 @@ export interface RegisterRequest {
   address?: string;
   role?: 'admin' | 'employee' | 'client';
 }
+
+export interface UpdateOrderStatusRequest {
+  status: 'pending' | 'preparing' | 'ready' | 'delivering' | 'delivered' | 'cancelled';
+}
+
+// Vous pouvez aussi ajouter d'autres interfaces utiles :
+
+export interface OrderStatusUpdate {
+  status: 'pending' | 'preparing' | 'ready' | 'delivering' | 'delivered' | 'cancelled';
+  updated_at?: string;
+  notes?: string;
+}
+
+export interface OrderFilters {
+  status?: string;
+  date_from?: string;
+  date_to?: string;
+  search?: string;
+}

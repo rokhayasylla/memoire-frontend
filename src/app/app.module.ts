@@ -21,6 +21,14 @@ import { CartModalComponent } from './layout/cart-modal/cart-modal.component';
 import { RegisterComponent } from './layout/register/register.component';
 import { ClientOrdersComponent } from './layout/client-orders/client-orders.component';
 import { ClientInvoicesComponent } from './layout/client-invoices/client-invoices.component';
+import { EmployeeLayoutComponent } from './layout/employee-layout/employee-layout.component';
+import { EmployeeDeliveriesComponent } from './layout/employee-deliveries/employee-deliveries.component';
+import { EmployeeSupportComponent } from './layout/employee-support/employee-support.component';
+import { EmployeeOrdersComponent } from './layout/employee-orders/employee-orders.component';
+import { RouterModule } from '@angular/router';
+import { ClientchatComponent } from './layout/clientchat/clientchat.component';
+import { CommonModule } from '@angular/common';
+
 
 
 @NgModule({
@@ -40,7 +48,12 @@ import { ClientInvoicesComponent } from './layout/client-invoices/client-invoice
     CartModalComponent,
     RegisterComponent,
     ClientOrdersComponent,
-    ClientInvoicesComponent
+    ClientInvoicesComponent,
+    EmployeeLayoutComponent,
+    EmployeeDeliveriesComponent,
+    EmployeeSupportComponent,
+    EmployeeOrdersComponent,
+    ClientchatComponent
   ],
     imports: [
         BrowserModule,
@@ -48,6 +61,10 @@ import { ClientInvoicesComponent } from './layout/client-invoices/client-invoice
         ReactiveFormsModule,
         HttpClientModule,
         FormsModule,
+        FormsModule,
+        RouterModule,
+        CommonModule,   
+        ReactiveFormsModule,
     ],
   providers: [
     provideHttpClient(

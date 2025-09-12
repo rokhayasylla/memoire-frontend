@@ -1,15 +1,20 @@
 import { OrderItem } from './orderitem';
 import { User } from './user';
 
+// Types exportés pour réutilisation
+export type OrderStatus = 'pending' | 'preparing' | 'ready' | 'delivering' | 'delivered' | 'cancelled';
+export type PaymentMethod = 'cash_on_delivery' | 'online';
+export type PaymentStatus = 'pending' | 'paid' | 'failed';
+
 export interface Order {
   id: number;
   order_number: string;
   user_id: number;
   total_amount: number;
   discount_amount: number;
-  status: 'pending' | 'preparing' | 'ready' | 'delivering' | 'delivered' | 'cancelled';
-  payment_method: 'cash_on_delivery' | 'online';
-  payment_status: 'pending' | 'paid' | 'failed';
+  status: OrderStatus;
+  payment_method: PaymentMethod;
+  payment_status: PaymentStatus;
   delivery_address: string;
   delivered_at?: string;
   created_at: string;
@@ -32,7 +37,7 @@ export interface Invoice {
 }
 
 export interface CreateOrderRequest {
-  payment_method: 'cash_on_delivery' | 'online';
+  payment_method: PaymentMethod;
   delivery_address: string;
   notes?: string;
   items: {
@@ -42,5 +47,5 @@ export interface CreateOrderRequest {
 }
 
 export interface UpdateOrderStatusRequest {
-  status: 'pending' | 'preparing' | 'ready' | 'delivering' | 'delivered' | 'cancelled';
+  status: OrderStatus;
 }

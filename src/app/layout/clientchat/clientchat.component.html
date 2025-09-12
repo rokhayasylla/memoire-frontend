@@ -1,0 +1,113 @@
+<!-- Chat button -->
+<div class="fixed bottom-6 right-6 z-50">   
+  <!-- Badge de notification -->   
+  <div *ngIf="unreadCount > 0"         
+       class="absolute -top-2 -left-2 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold z-10">     
+    {{ unreadCount > 99 ? '99+' : unreadCount }}   
+  </div>      
+
+  <!-- Bouton principal -->   
+  <button     
+    (click)="toggleChat()"     
+    class="bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600             
+           text-white rounded-full w-14 h-14 shadow-lg hover:shadow-xl transform hover:scale-105             
+           transition-all duration-200 flex items-center justify-center"     
+    [class.animate-bounce]="hasNewMessage">     
+    <i class="fas fa-comments text-xl"></i>   
+  </button> 
+</div>  
+
+<!-- Fenêtre de chat --> 
+<div *ngIf="isChatOpen"       
+     class="fixed bottom-24 right-6 w-80 h-96 bg-white rounded-lg shadow-2xl border border-gray-200 flex flex-col z-40 transform transition-all duration-300">      
+
+  <!-- Header -->   
+  <div class="bg-gradient-to-r from-orange-500 to-amber-500 text-white p-4 rounded-t-lg flex items-center justify-between">     
+    <div class="flex items-center space-x-2">       
+      <i class="fas fa-headset"></i>       
+      <h3 class="font-semibold">Support Client</h3>     
+    </div>     
+    <button (click)="closeChat()" 
+            class="hover:bg-white/20 rounded p-1 transition-colors">       
+      <i class="fas fa-times"></i>     
+    </button>   
+  </div>    
+
+  <!-- Messages -->   
+  <div class="flex-1 overflow-y-auto p-4 space-y-3" 
+       #messagesContainer
+       id="messagesContainer">     
+    
+    <!-- Loading state -->
+    <div *ngIf="loading" class="text-center py-4">       
+      <div class="w-6 h-6 border-2 border-orange-200 border-t-orange-500 rounded-full animate-spin mx-auto mb-2"></div>
+      <p class="text-sm text-gray-500">Chargement...</p>
+    </div>      
+
+    <!-- Messages list -->
+    <div *ngIf="!loading">
+      <div *ngFor="let message of messages; trackBy: trackByMessageId"           
+           class="flex"          
+           [class.justify-end]="message.sender_type === 'client'"          
+           [class.justify-start]="message.sender_type === 'support'">              
+
+        <div class="max-w-xs lg:max-w-md px-3 py-2 rounded-lg"            
+             [class.bg-orange-500]="message.sender_type === 'client'"            
+             [class.text-white]="message.sender_type === 'client'"            
+             [class.bg-gray-200]="message.sender_type === 'support'"            
+             [class.text-gray-800]="message.sender_type === 'support'">                  
+
+          <p class="text-sm break-words">{{ message.message }}</p>         
+          <p class="text-xs mt-1 opacity-70">           
+            {{ formatMessageTime(message.created_at) }}
+            <span *ngIf="message.sender_type === 'client' && message.is_read" 
+                  class="ml-1 text-green-300">✓</span>         
+          </p>       
+        </div>     
+      </div>      
+
+      <!-- Empty state -->
+      <div *ngIf="messages.length === 0"           
+           class="text-center py-8 text-gray-500">       
+        <i class="fas fa-comments text-3xl mb-2 block text-gray-300"></i>       
+        <p class="text-sm">Démarrez une conversation avec notre équipe support</p>     
+      </div>
+    </div>   
+  </div>    
+
+  <!-- Input section -->   
+  <div class="p-4 border-t border-gray-200">     
+    <form (ngSubmit)="sendMessage()" class="flex space-x-2">       
+      <input         
+        [(ngModel)]="newMessage"         
+        name="message"         
+        type="text"         
+        placeholder="Tapez votre message..."         
+        class="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-orange-500 text-sm"         
+        [disabled]="sending"         
+        maxlength="500"
+        autocomplete="off">       
+      
+      <button         
+        type="submit"         
+        [disabled]="!newMessage.trim() || sending"         
+        class="bg-orange-500 hover:bg-orange-600 disabled:bg-gray-300 text-white rounded-lg px-4 py-2 transition-colors flex-shrink-0">         
+        <i class="fas fa-paper-plane text-sm" 
+           [class.fa-spin]="sending"
+           [class.fa-paper-plane]="!sending"
+           [class.fa-spinner]="sending"></i>       
+      </button>     
+    </form>
+    
+    <!-- Character counter -->
+    <div class="text-xs text-gray-400 mt-1 text-right">
+      {{ newMessage.length }}/500
+    </div>   
+  </div> 
+</div>  
+
+<!-- Overlay --> 
+<div *ngIf="isChatOpen"       
+     class="fixed inset-0 bg-black bg-opacity-25 z-30"      
+     (click)="closeChat()"> 
+</div>
