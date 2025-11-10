@@ -19,21 +19,20 @@ export class EmployeeSupportComponent implements OnInit, OnDestroy {
   sendingReply = false;
   
   private subscriptions: Subscription[] = [];
+  private lastSentMessageId: number | null = null; // ✅ AJOUT
 
   constructor(private chatService: ChatmessageService) {}
 
   ngOnInit(): void {
     this.loadConversations();
     
-    // S'abonner aux nouveaux messages (uniquement pour les messages clients)
+    // ✅ CORRECTION : Ne s'abonner qu'aux messages clients
     const newMessageSub = this.chatService.newMessages$.subscribe(message => {
       if (message && message.sender_type === 'client') {
-        // Actualiser la liste des conversations seulement pour les nouveaux messages clients
+        // Actualiser seulement pour les messages clients
         this.loadConversations();
         
-        // Si c'est pour la conversation active, ajouter le message
         if (this.selectedConversation && message.user_id === this.selectedConversation.user_id) {
-          // Vérifier si le message n'existe pas déjà
           const existingMessageIndex = this.messages.findIndex(m => m.id === message.id);
           if (existingMessageIndex === -1) {
             this.messages.push(message);
@@ -41,16 +40,18 @@ export class EmployeeSupportComponent implements OnInit, OnDestroy {
           }
         }
       }
+      // ✅ NE RIEN FAIRE pour les messages de support (ils sont déjà ajoutés manuellement)
     });
     this.subscriptions.push(newMessageSub);
 
-    // Polling périodique réduit pour éviter la surcharge
+    // ✅ CORRECTION : Polling moins agressif
     const pollingSub = setInterval(() => {
       this.loadConversations();
-      if (this.selectedConversation) {
+      // ✅ Ne recharger les messages que si l'employé n'est pas en train d'envoyer
+      if (this.selectedConversation && !this.sendingReply) {
         this.loadMessages(this.selectedConversation.user_id, false);
       }
-    }, 30000); // Augmenté à 30 secondes
+    }, 30000);
     
     this.subscriptions.push({
       unsubscribe: () => clearInterval(pollingSub)
@@ -83,10 +84,8 @@ export class EmployeeSupportComponent implements OnInit, OnDestroy {
     this.selectedConversation = conversation;
     this.loadMessages(conversation.user_id);
     
-    // Marquer les messages comme lus
     this.chatService.markMessagesAsRead(conversation.user_id).subscribe({
       next: () => {
-        // Mettre à jour le compteur de messages non lus
         conversation.unread_count = 0;
       }
     });
@@ -108,6 +107,7 @@ export class EmployeeSupportComponent implements OnInit, OnDestroy {
     });
   }
 
+  // ✅ CORRECTION PRINCIPALE
   sendReply(): void {
     if (!this.replyMessage.trim() || !this.selectedConversation || this.sendingReply) return;
 
@@ -117,18 +117,24 @@ export class EmployeeSupportComponent implements OnInit, OnDestroy {
 
     this.chatService.sendSupportReply(this.selectedConversation.user_id, messageText).subscribe({
       next: (message) => {
-        // Ajouter directement le message à la liste (pas de duplication car envoyé depuis cette interface)
-        this.messages.push(message);
+        // ✅ Sauvegarder l'ID du dernier message envoyé
+        this.lastSentMessageId = message.id || null;
+        
+        // ✅ Vérifier si le message n'existe pas déjà avant de l'ajouter
+        const existingMessageIndex = this.messages.findIndex(m => m.id === message.id);
+        if (existingMessageIndex === -1) {
+          this.messages.push(message);
+        }
         
         this.sendingReply = false;
         setTimeout(() => this.scrollToBottom(), 100);
         
-        // Actualiser la liste des conversations
+        // ✅ Actualiser les conversations SANS recharger les messages
         this.loadConversations();
       },
       error: (error) => {
         console.error('Erreur lors de l\'envoi de la réponse:', error);
-        this.replyMessage = messageText; // Restaurer le message
+        this.replyMessage = messageText;
         this.sendingReply = false;
       }
     });

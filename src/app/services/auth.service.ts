@@ -184,6 +184,12 @@ export class AuthService {
     return user?.role === 'client';
   }
 
+  isLivreur(): boolean {
+    const user = this.getCurrentUserValue();
+    return user?.role === 'livreur';
+  }
+
+
   redirectBasedOnRole(): void {
     const user = this.getCurrentUserValue();
     if (!user) {
@@ -200,6 +206,9 @@ export class AuthService {
         break;
       case 'client':
         this.router.navigate(['/client']);
+        break;
+      case 'livreur':
+        this.router.navigate(['/livreur']);
         break;
       default:
         this.router.navigate(['/login']);

@@ -355,7 +355,8 @@ export class EmployeeOrdersComponent implements OnInit {
     const roleLabels = {
       'admin': 'Administrateur',
       'employee': 'Employé',
-      'client': 'Client'
+      'client': 'Client',
+      'livreur': 'Livreur'
     };
     return order.user ? roleLabels[order.user.role] : '';
   }

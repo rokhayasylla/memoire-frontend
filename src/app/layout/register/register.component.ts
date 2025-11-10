@@ -20,7 +20,9 @@ export class RegisterComponent implements OnInit {
   roleOptions = [
     { value: 'client', label: 'Client', description: 'Passer des commandes et gérer mon compte', icon: 'fas fa-user' },
     { value: 'employee', label: 'Employé', description: 'Gérer les commandes et livraisons', icon: 'fas fa-user-tie' },
-    { value: 'admin', label: 'Administrateur', description: 'Gestion complète de la boulangerie', icon: 'fas fa-user-shield' }
+    { value: 'admin', label: 'Administrateur', description: 'Gestion complète de la boulangerie', icon: 'fas fa-user-shield' },
+    { value: 'livreur', label: 'Livreur', description: 'Acomplir livraison', icon: 'fas fa-user-shield' }
+
   ];
 
   constructor(
@@ -123,6 +125,10 @@ export class RegisterComponent implements OnInit {
         break;
       case 'employee':
         this.router.navigate(['/employee']);
+        break;
+
+      case 'livreur':
+        this.router.navigate(['/livreur']);
         break;
       case 'client':
       default:

@@ -57,7 +57,7 @@ private sendDeliveryStartedEmail(order: Order): void {
       console.log(`✅ Email de début de livraison envoyé pour la commande ${order.order_number}`);
     },
     error: (error) => {
-      console.error('❌ Erreur lors de l\'envoi de l\'email de livraison:', error);
+      console.error(' Erreur lors de l\'envoi de l\'email de livraison:', error);
     }
   });
 }
@@ -205,4 +205,37 @@ private generateInvoiceForOrder(order: Order): void {
   markAsCancelled(orderId: number): Observable<Order> {
     return this.updateOrderStatusWithInvoice(orderId, 'cancelled');
   }
+
+
+  // ✅ Nouvelle méthode pour assigner un livreur
+  assignLivreur(orderId: number, livreurId: number): Observable<Order> {
+    return this.http.post<Order>(
+      `${this.apiUrl}/orders/${orderId}/assign-livreur`,
+      { livreur_id: livreurId }
+    );
+  }
+
+  //  Récupérer les commandes d'un livreur spécifique
+  getLivreurOrders(livreurId: number): Observable<Order[]> {
+    return this.http.get<Order[]>(`${this.apiUrl}/orders/livreur/${livreurId}`);
+  }
+  //  NOUVELLE MÉTHODE pour marquer le paiement comme reçu
+markPaymentReceived(orderId: number): Observable<Order> {
+  return this.http.post<Order>(
+    `${this.apiUrl}/orders/${orderId}/mark-payment-received`,
+    {}
+  );
+}
+
+
+ getAllOrders(): Observable<Order[]> {
+    return this.http.get<Order[]>(`${this.apiUrl}/admin/orders`);
+  }
+
+// Obtenir une commande par ID
+  getOrderById(id: number): Observable<Order> {
+    return this.http.get<Order>(`${this.apiUrl}/${id}`);
+  }
+   
+
 }

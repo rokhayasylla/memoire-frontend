@@ -4,7 +4,7 @@ export interface User {
   email: string;
   phone?: string;
   address?: string;
-  role: 'admin' | 'employee' | 'client';
+  role: 'admin' | 'employee' | 'client' | 'livreur';
   is_active: boolean;
 }
 
@@ -14,7 +14,7 @@ export interface CreateUserRequest {
   password: string;
   phone?: string;
   address?: string;
-  role: 'admin' | 'employee' | 'client';
+  role: 'admin' | 'employee' | 'client' | 'livreur';
 }
 
 export interface UpdateUserRequest {
@@ -23,7 +23,7 @@ export interface UpdateUserRequest {
   password?: string;
   phone?: string;
   address?: string;
-  role?: 'admin' | 'employee' | 'client';
+  role?: 'admin' | 'employee' | 'client' | 'livreur';
   is_active?: boolean;
 }
 
@@ -45,7 +45,7 @@ export interface RegisterRequest {
   password: string;
   phone?: string;
   address?: string;
-  role?: 'admin' | 'employee' | 'client';
+  role?: 'admin' | 'employee' | 'client' | 'livreur';
 }
 
 export interface UpdateOrderStatusRequest {

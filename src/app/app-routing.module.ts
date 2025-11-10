@@ -18,6 +18,9 @@ import { employeeGuard } from './guard/employee.guard';
 import { EmployeeDeliveriesComponent } from './layout/employee-deliveries/employee-deliveries.component';
 import { EmployeeOrdersComponent } from './layout/employee-orders/employee-orders.component';
 import { EmployeeSupportComponent } from './layout/employee-support/employee-support.component';
+import { livreurGuard } from './guard/livreur.guard';
+import { LivreurLayoutComponent } from './layout/livreur-layout/livreur-layout.component';
+import { LivreurDeliveriesComponent } from './livreur-deliveries/livreur-deliveries.component';
 
 const routes: Routes = [
   {
@@ -47,6 +50,21 @@ const routes: Routes = [
     path: 'employee',
     component: EmployeeLayoutComponent,
     canActivate: [authGuard, employeeGuard]
+  },
+  {
+    path: 'livreur',
+    component: LivreurLayoutComponent,
+    canActivate: [authGuard, livreurGuard],
+    children:[
+      {
+        path: '',
+        component: LivreurDeliveriesComponent // Route par défaut
+      },
+      {
+        path: 'deliveries',
+        component: LivreurDeliveriesComponent
+      }
+    ]
   },
   {
     path: 'product-category-management',

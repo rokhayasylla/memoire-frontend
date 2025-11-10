@@ -1,9 +1,10 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
-import { Chart } from 'chart.js';
+import { Chart,ChartConfiguration,registerables } from 'chart.js';
 import { Order } from '../../models/order';
 import { DailyStats } from '../../models/daily-stats';
 import { OrderService } from '../../services/order.service';
 
+Chart.register(...registerables);
 @Component({
   selector: 'app-statistics-dashboard',
   templateUrl: './statistics-dashboard.component.html',

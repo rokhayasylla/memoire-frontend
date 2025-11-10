@@ -66,7 +66,7 @@
           
           <!-- Actions Buttons -->
           <div class="flex space-x-2">
-            <!-- Advance Status Button -->
+            <!-- Advance Status Button 
             <button
               *ngIf="canAdvanceStatus(order)"
               (click)="advanceOrderStatus(order)"
@@ -78,7 +78,7 @@
               <span>{{ getNextStatusLabel(order) }}</span>
             </button>
 
-            <!-- Quick Finalize Button for orders ready to deliver -->
+             Quick Finalize Button for orders ready to deliver 
             <button
               *ngIf="order.status === 'delivering'"
               (click)="finalizeOrder(order)"
@@ -89,7 +89,7 @@
               <i class="fas fa-check-circle"></i>
               <span>Livrer</span>
             </button>
-
+-->
             <!-- View Details Button -->
             <button
               (click)="viewOrderDetails(order)"

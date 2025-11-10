@@ -19,7 +19,7 @@ export class UserManagementComponent implements OnInit {
     password: '',
     phone: '',
     address: '',
-    role: 'client' as 'admin' | 'employee' | 'client',
+    role: 'client' as 'admin' | 'employee' | 'client' | 'livreur',
     is_active: true
   };
 
@@ -224,7 +224,8 @@ export class UserManagementComponent implements OnInit {
     const roleNames = {
       admin: 'Administrateur',
       employee: 'Employé',
-      client: 'Client'
+      client: 'Client',
+      livreur: 'Livreur'
     };
     return roleNames[role as keyof typeof roleNames] || role;
   }
@@ -233,7 +234,8 @@ export class UserManagementComponent implements OnInit {
     const roleClasses = {
       admin: 'bg-red-100 text-red-800',
       employee: 'bg-blue-100 text-blue-800',
-      client: 'bg-green-100 text-green-800'
+      client: 'bg-green-100 text-green-800',
+      livreur: 'bg-yellow-100 text-yellow-800' 
     };
     return roleClasses[role as keyof typeof roleClasses] || 'bg-gray-100 text-gray-800';
   }

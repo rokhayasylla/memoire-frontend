@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Order } from '../../models/order';
 import { OrderService } from '../../services/order.service';
+import { User } from '../../models/user';
+import { UserService } from '../../services/user.service';
 
 export type OrderStatus = 'pending' | 'preparing' | 'ready' | 'delivering' | 'delivered' | 'cancelled';
 
@@ -14,9 +16,12 @@ export class EmployeeDeliveriesComponent implements OnInit {
   orders: Order[] = [];
   filteredOrders: Order[] = [];
   loading = false;
+  livreurs: User[] = [];  //  Liste des livreurs
   error: string | null = null;
   selectedOrder: Order | null = null;
   showOrderDetails = false;
+  showAssignLivreurModal = false;  // ✅ Modal d'assignation
+  selectedLivreurId: number | null = null;  // ✅ Livreur sélectionné
   
   // Filtres
   statusFilter = 'all';
@@ -31,7 +36,10 @@ export class EmployeeDeliveriesComponent implements OnInit {
     delivered: 0
   };
 
-  constructor(private orderService: OrderService) {}
+  constructor(
+    private orderService: OrderService,
+    private userService: UserService  // ✅ Injection du UserService
+  ) {}
 
   /**
    * Initialise le composant au démarrage
@@ -39,10 +47,66 @@ export class EmployeeDeliveriesComponent implements OnInit {
    */
   ngOnInit(): void {
     this.loadOrders();
+    this.loadLivreurs();  // ✅ Charger les livreurs
     // Rafraîchissement automatique toutes les 30 secondes
     setInterval(() => {
       this.loadOrders();
     }, 30000);
+  }
+
+
+  // ✅ Charger tous les livreurs
+  loadLivreurs(): void {
+    this.userService.getLivreurs().subscribe({
+      next: (livreurs) => {
+        this.livreurs = livreurs;
+      },
+      error: (error) => {
+        console.error('Erreur lors du chargement des livreurs:', error);
+      }
+    });
+  }
+   // ✅ Ouvrir le modal d'assignation
+  openAssignLivreurModal(order: Order): void {
+    this.selectedOrder = order;
+    this.selectedLivreurId = order.livreur_id || null;
+    this.showAssignLivreurModal = true;
+  }
+
+
+  // ✅ Fermer le modal d'assignation
+  closeAssignLivreurModal(): void {
+    this.showAssignLivreurModal = false;
+    this.selectedOrder = null;
+    this.selectedLivreurId = null;
+  }
+
+  // ✅ Assigner un livreur à la commande
+  assignLivreur(): void {
+    if (!this.selectedOrder || !this.selectedLivreurId) {
+      this.error = 'Veuillez sélectionner un livreur';
+      return;
+    }
+
+    this.loading = true;
+    this.orderService.assignLivreur(this.selectedOrder.id, this.selectedLivreurId).subscribe({
+      next: (updatedOrder: Order) => {
+        // Mettre à jour la commande dans la liste
+        const index = this.orders.findIndex(o => o.id === updatedOrder.id);
+        if (index !== -1) {
+          this.orders[index] = updatedOrder;
+          this.filterOrders();
+        }
+        
+        this.closeAssignLivreurModal();
+        this.loading = false;
+      },
+      error: (error: any) => {
+        this.error = 'Erreur lors de l\'assignation du livreur';
+        this.loading = false;
+        console.error('Error assigning livreur:', error);
+      }
+    });
   }
   
   /**

@@ -28,6 +28,8 @@ import { EmployeeOrdersComponent } from './layout/employee-orders/employee-order
 import { RouterModule } from '@angular/router';
 import { ClientchatComponent } from './layout/clientchat/clientchat.component';
 import { CommonModule } from '@angular/common';
+import { LivreurLayoutComponent } from './layout/livreur-layout/livreur-layout.component';
+import { LivreurDeliveriesComponent } from './livreur-deliveries/livreur-deliveries.component';
 
 
 
@@ -53,7 +55,9 @@ import { CommonModule } from '@angular/common';
     EmployeeDeliveriesComponent,
     EmployeeSupportComponent,
     EmployeeOrdersComponent,
-    ClientchatComponent
+    ClientchatComponent,
+    LivreurLayoutComponent,
+    LivreurDeliveriesComponent
   ],
     imports: [
         BrowserModule,

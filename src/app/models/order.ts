@@ -20,6 +20,8 @@ export interface Order {
   created_at: string;
   updated_at: string;
   user?: User;
+  livreur_id?: number | null; 
+  livreur?: User | null; 
   order_items?: OrderItem[];   // Changé de orderItems à order_items pour correspondre à l'API
   orderItems?: OrderItem[];    // Garder aussi orderItems pour la compatibilité
   invoice?: Invoice;

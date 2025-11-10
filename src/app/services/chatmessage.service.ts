@@ -101,7 +101,7 @@ export class ChatmessageService {
       tap(response => {
         // Notifier le nouveau message seulement pour les messages de support
         // Car ils doivent être visibles côté client
-        this.notifyNewMessage(response);
+       // this.notifyNewMessage(response);
       })
     );
   }
