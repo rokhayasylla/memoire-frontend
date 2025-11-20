@@ -21,10 +21,7 @@
 
 <!-- Header -->
 <div class="flex justify-between items-center mb-6">
-  <div>
-    <h3 class="text-lg font-medium text-gray-900">Gestion des Utilisateurs</h3>
-    <p class="text-sm text-gray-500">Gérez les comptes utilisateurs de votre boulangerie</p>
-  </div>
+  
   <button
     (click)="openUserModal()"
     class="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200 flex items-center space-x-2"
@@ -126,16 +123,16 @@
         <!-- Actions -->
         <td class="px-6 py-4 whitespace-nowrap text-right">
           <div class="flex items-center justify-end space-x-1">
-            <!-- Bouton Activer/Désactiver -->
-            <button
+            <!-- Bouton Activer/Désactiver
               (click)="toggleUserStatus(user)"
               [class]="user.is_active ? 'text-red-600 hover:bg-red-100' : 'text-green-600 hover:bg-green-100'"
               class="p-2 rounded-lg transition-colors duration-200"
               [title]="user.is_active ? 'Désactiver' : 'Activer'"
-            >
+            > 
+            <button
               <i [class]="user.is_active ? 'fas fa-user-slash' : 'fas fa-user-check'"></i>
             </button>
-
+-->
             <!-- Bouton Modifier -->
             <button
               (click)="openUserModal(user)"
@@ -256,7 +253,7 @@
           [(ngModel)]="userForm.role"
           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-orange-500 focus:border-orange-500"
         >
-          <option value="client">Client</option>
+          <!--<option value="client">Client</option>-->
           <option value="employee">Employé</option>
           <option value="admin">Administrateur</option>
           <option value="livreur">Livreur</option>

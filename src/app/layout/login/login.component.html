@@ -1,14 +1,23 @@
 <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 to-amber-50">
   <div class="max-w-md w-full space-y-8 p-8">
     <div class="bg-white rounded-2xl shadow-xl p-8">
-      <!-- Header -->
-      <div class="text-center mb-8">
-        <div class="w-16 h-16 bg-gradient-to-r from-orange-400 to-amber-400 rounded-full flex items-center justify-center mx-auto mb-4">
-          <i class="fas fa-bread-slice text-white text-2xl"></i>
-        </div>
-        <h2 class="text-3xl font-bold text-gray-900 mb-2">Connexion</h2>
-        <p class="text-gray-600">Accédez à votre espace de gestion</p>
-      </div>
+  <div class="text-center mb-8">
+
+  <div class="flex justify-center mb-4">
+    <div class="w-16 h-16 bg-gradient-to-br from-orange-500 to-amber-500 rounded-full flex items-center justify-center shadow-2xl hover:scale-110 transition-transform">
+      <i class="fas fa-store text-white text-2xl"></i>
+    </div>
+  </div>
+  
+  <!-- Nom de l'entreprise avec dégradé -->
+  <h1 class="text-2xl font-bold bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent mb-4">
+    RSTrading
+  </h1>
+  
+  <!-- Titre de la page -->
+  <h2 class="text-3xl font-bold text-gray-900 mb-2">Connexion</h2>
+  <p class="text-gray-600">Accédez à votre espace de gestion</p>
+</div>
 
       <!-- Form -->
       <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-6" novalidate>

@@ -12,16 +12,18 @@
   <div class="w-64 bg-white shadow-lg flex flex-col">
     <!-- Header -->
     <div class="p-6 border-b border-gray-200">
-      <div class="flex items-center space-x-3">
-        <div class="w-10 h-10 bg-gradient-to-r from-orange-400 to-amber-400 rounded-full flex items-center justify-center">
-          <i class="fas fa-bread-slice text-white"></i>
-        </div>
-        <div>
-          <h1 class="text-xl font-bold text-gray-900">Boulangerie</h1>
-          <p class="text-sm text-gray-500">Administration</p>
-        </div>
-      </div>
+  <div class="flex items-center space-x-3">
+    <div class="w-8 h-8 bg-gradient-to-br from-orange-500 to-amber-500 rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
+      <i class="fas fa-store text-white text-sm"></i>
     </div>
+    <div>
+      <h1 class="text-xl font-bold bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent">
+        RSTrading
+      </h1>
+      <p class="text-sm text-gray-500">Administration</p>
+    </div>
+  </div>
+</div>
 
     <!-- User Info -->
     <div class="p-4 border-b border-gray-200" *ngIf="currentUser">
@@ -134,6 +136,7 @@
 
           <!-- Quick Stats -->
           <div *ngIf="!loadingStats && dashboardStats" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            
             <!-- Utilisateurs -->
             <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
               <div class="flex items-center justify-between">
@@ -182,20 +185,6 @@
                 </div>
               </div>
             </div>
-
-            <!-- Revenue -->
-            <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
-              <div class="flex items-center justify-between">
-                <div>
-                  <p class="text-sm font-medium text-gray-600">Chiffre d'affaires</p>
-                  <p class="text-3xl font-bold text-gray-900">{{ formatCurrency(dashboardStats.totalRevenue) }}</p>
-                  <p class="text-xs text-gray-500 mt-1">Commandes livrées</p>
-                </div>
-                <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                  <i class="fas fa-coins text-purple-600"></i>
-                </div>
-              </div>
-            </div>
           </div>
 
           <!-- Additional Stats Row -->
@@ -211,13 +200,7 @@
                   </div>
                   <span class="text-lg font-semibold text-gray-900">{{ dashboardStats.activePromotions }}</span>
                 </div>
-                <div class="flex items-center justify-between">
-                  <div class="flex items-center space-x-2">
-                    <i class="fas fa-cubes text-blue-500"></i>
-                    <span class="text-sm text-gray-600">Packs disponibles</span>
-                  </div>
-                  <span class="text-lg font-semibold text-gray-900">{{ dashboardStats.activePacks }}</span>
-                </div>
+               
               </div>
             </div>
 

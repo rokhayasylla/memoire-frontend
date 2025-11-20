@@ -21,7 +21,7 @@ export class AdminLayoutComponent implements OnInit {
     { key: 'dashboard', label: 'Tableau de bord', icon: 'fas fa-tachometer-alt' },
     { key: 'users', label: 'Utilisateurs', icon: 'fas fa-users' },
     { key: 'products', label: 'Produits & Catégories', icon: 'fas fa-box' },
-    { key: 'packs', label: 'Packs', icon: 'fas fa-cubes' },
+   // { key: 'packs', label: 'Packs', icon: 'fas fa-cubes' },
     { key: 'promotions', label: 'Promotions', icon: 'fas fa-tags' },
     { key: 'orders', label: 'Commandes', icon: 'fas fa-shopping-cart' },
     { key: 'statistics', label: 'Statistiques', icon: 'fas fa-chart-bar' }
@@ -105,7 +105,7 @@ export class AdminLayoutComponent implements OnInit {
 
   getActiveTabDescription(): string {
     const descriptions: { [key: string]: string } = {
-      dashboard: 'Vue d\'ensemble de votre boulangerie',
+      dashboard: 'Vue d\'ensemble de votre commerce',
       users: 'Gestion des utilisateurs et des rôles',
       products: 'Gestion des produits et catégories',
       packs: 'Gestion des packs disponibles',

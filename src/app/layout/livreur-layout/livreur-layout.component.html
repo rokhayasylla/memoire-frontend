@@ -1,34 +1,31 @@
 <div class="min-h-screen bg-gray-50">
-  <!-- Navbar -->
-  <nav class="bg-white shadow-sm border-b border-gray-200">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex justify-between h-16">
-        <div class="flex items-center">
-          <i class="fas fa-truck text-orange-600 text-2xl mr-3"></i>
-          <span class="text-xl font-bold text-gray-900">RSTrading</span>
+  <!-- Sidebar + Content -->
+  <div class="flex h-screen">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white shadow-lg flex flex-col relative">
+      <!-- Header avec logo -->
+      <div class="p-6 border-b border-gray-200">
+        <div class="flex items-center space-x-3">
+          <div class="w-8 h-8 bg-gradient-to-br from-orange-500 to-amber-500 rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
+            <i class="fas fa-store text-white text-sm"></i>
+          </div>
+          <div>
+            <h1 class="text-xl font-bold bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent">
+              RSTrading
+            </h1>
+            <p class="text-sm text-gray-500">Livraison</p>
+          </div>
         </div>
       </div>
-    </div>
-  </nav>
 
-  <!-- Sidebar + Content -->
-  <div class="flex">
-    <!-- Sidebar -->
-    <aside class="w-80 bg-white min-h-screen relative">
-      <!-- User Info Section -->
-      <div class="pt-8 px-6">
-        <h2 class="text-2xl font-bold text-gray-900 mb-1">Livreur</h2>
-        <p class="text-gray-500 mb-8">Gestion</p>
-
-        <!-- User Card -->
-        <div class="pb-6 border-b border-gray-200 mb-6">
-          <p class="text-base font-medium text-gray-900">{{ currentUser?.full_name }}</p>
-          <p class="text-sm text-gray-500">Livreur</p>
-        </div>
+      <!-- User Card -->
+      <div class="p-6 border-b border-gray-200">
+        <p class="text-base font-medium text-gray-900">{{ currentUser?.full_name }}</p>
+        <p class="text-sm text-gray-500">Livreur</p>
       </div>
 
       <!-- Navigation Menu -->
-      <nav class="px-6 space-y-1">
+      <nav class="px-6 py-4 space-y-1 flex-1">
         <!-- Livraisons -->
         <a 
           routerLink="/livreur" 
@@ -40,8 +37,8 @@
         </a>
       </nav>
 
-      <!-- Déconnexion Button (Bottom) - EN DEHORS DU NAV -->
-      <div class="absolute bottom-8 left-6 right-6">
+      <!-- Déconnexion Button (Bottom) -->
+      <div class="p-6 border-t border-gray-200">
         <button 
           (click)="logout()" 
           class="w-full flex items-center px-4 py-3 text-base font-medium rounded-lg hover:bg-red-50 text-red-600 transition-colors">
@@ -52,7 +49,7 @@
     </aside>
 
     <!-- Main Content -->
-    <main class="flex-1 bg-gray-50">
+    <main class="flex-1 bg-gray-50 overflow-auto">
       <!-- Header Section -->
       <div class="bg-white px-8 py-6 border-b border-gray-200">
         <h1 class="text-3xl font-bold text-gray-900 mb-2">Gestion des livraisons</h1>
