@@ -9,12 +9,31 @@ import { Product, CreateProductRequest, UpdateProductRequest } from '../models/p
 })
 export class ProductService {
   private readonly apiUrl = environment.ApiUrl;
+  private readonly baseUrl = 'https://memoire-backend-main-w7xm0f.laravel.cloud';
 
   constructor(private http: HttpClient) {}
 
   // Getter pour accéder à l'apiUrl depuis le composant
   get baseApiUrl(): string {
     return this.apiUrl;
+  }
+
+  // Méthode pour construire l'URL complète des images
+  getImageUrl(imagePath: string | null | undefined): string {
+    if (!imagePath) {
+      return 'assets/images/placeholder.jpg'; // Image par défaut
+    }
+
+    // Si c'est déjà une URL complète, la retourner telle quelle
+    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+      return imagePath;
+    }
+
+    // Nettoyer le chemin (enlever les slashes en début)
+    const cleanPath = imagePath.replace(/^\/+/, '');
+
+    // Construire l'URL complète
+    return `${this.baseUrl}/storage/${cleanPath}`;
   }
 
   getProducts(): Observable<Product[]> {

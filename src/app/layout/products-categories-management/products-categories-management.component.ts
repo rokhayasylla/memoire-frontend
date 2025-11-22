@@ -42,7 +42,7 @@ export class ProductsCategoriesManagementComponent implements OnInit {
 
   constructor(
     private categoryService: CategoryService,
-    private productService: ProductService
+    public productService: ProductService // Changé en public pour l'utiliser dans le template
   ) {}
 
   ngOnInit(): void {
@@ -357,36 +357,11 @@ export class ProductsCategoriesManagementComponent implements OnInit {
     return category ? category.name : 'Catégorie inconnue';
   }
 
-  getProductImageUrl(product: Product): string | null {
-    if (!product.image) return null;
-
-    // Si l'image commence par http, c'est déjà une URL complète
-    if (product.image.startsWith('http')) {
-      return product.image;
-    }
-
-    // Sinon, construire l'URL avec le domaine du backend
-    const baseUrl = this.getBaseUrl();
-    return `${baseUrl}/storage/images/${product.image}`;
-  }
-
-  private getBaseUrl(): string {
-    // Retirer '/api' de l'URL pour avoir l'URL de base du backend
-    return this.productService.baseApiUrl.replace('/api', '');
-  }
-
+  // SUPPRIMÉ: getProductImageUrl() - Utiliser productService.getImageUrl() à la place
+  
+  // Gestion des erreurs d'image
   onImageError(event: any): void {
-    // En cas d'erreur de chargement, masquer l'image
-    event.target.style.display = 'none';
-    // Optionnel: afficher un placeholder
-    const parent = event.target.parentElement;
-    if (parent) {
-      parent.innerHTML = `
-        <div class="text-center">
-          <i class="fas fa-image text-4xl text-gray-300 mb-2"></i>
-          <p class="text-sm text-gray-400">Image non disponible</p>
-        </div>
-      `;
-    }
+    // En cas d'erreur de chargement, afficher un placeholder
+    event.target.src = 'assets/images/placeholder.jpg';
   }
 }
