@@ -42,7 +42,7 @@ export class ProductsCategoriesManagementComponent implements OnInit {
 
   constructor(
     private categoryService: CategoryService,
-    public productService: ProductService // Changé en public pour l'utiliser dans le template
+    private productService: ProductService
   ) {}
 
   ngOnInit(): void {
@@ -306,7 +306,6 @@ export class ProductsCategoriesManagementComponent implements OnInit {
     }
   }
 
-  // Méthodes pour la gestion du stock
   getStockStatus(quantity: number): string {
     if (quantity === 0) return 'Rupture';
     if (quantity <= 10) return 'Faible';
@@ -319,13 +318,11 @@ export class ProductsCategoriesManagementComponent implements OnInit {
     return 'bg-green-100 text-green-800';
   }
 
-  // Méthode pour voir les détails d'un produit
   viewProduct(product: Product): void {
     this.currentProduct = product;
     this.showProductDetailsModal = true;
   }
 
-  // Méthode pour optimiser le trackBy du ngFor
   trackByProductId(index: number, product: Product): number {
     return product.id;
   }
@@ -357,11 +354,7 @@ export class ProductsCategoriesManagementComponent implements OnInit {
     return category ? category.name : 'Catégorie inconnue';
   }
 
-  // SUPPRIMÉ: getProductImageUrl() - Utiliser productService.getImageUrl() à la place
-  
-  // Gestion des erreurs d'image
   onImageError(event: any): void {
-    // En cas d'erreur de chargement, afficher un placeholder
     event.target.src = 'assets/images/placeholder.jpg';
   }
 }

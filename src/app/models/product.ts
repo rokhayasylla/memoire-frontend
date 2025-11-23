@@ -7,6 +7,7 @@ export interface Product {
   price: number;
   stock_quantity: number;
   image: string;
+  imageUrl?: string; 
   allergens?: string;
   category_id: number;
   category?: Category;

@@ -43,7 +43,6 @@
 
 <!-- Categories Tab -->
 <div *ngIf="activeTab === 'categories'">
-  <!-- Header -->
   <div class="flex justify-between items-center mb-6">
     <div>
       <h3 class="text-lg font-medium text-gray-900">Gestion des Catégories</h3>
@@ -58,7 +57,6 @@
     </button>
   </div>
 
-  <!-- Categories List -->
   <div class="bg-white rounded-lg shadow-sm border border-gray-200">
     <div class="px-6 py-4 border-b border-gray-200">
       <h4 class="text-lg font-medium text-gray-900">Liste des Catégories</h4>
@@ -109,7 +107,6 @@
 
 <!-- Products Tab -->
 <div *ngIf="activeTab === 'products'">
-  <!-- Header -->
   <div class="flex justify-between items-center mb-6">
     <div>
       <h3 class="text-lg font-medium text-gray-900">Gestion des Produits</h3>
@@ -124,19 +121,16 @@
     </button>
   </div>
 
-  <!-- Loading State -->
   <div *ngIf="loading" class="text-center py-8">
     <i class="fas fa-spinner fa-spin text-2xl text-gray-400"></i>
     <p class="text-gray-500 mt-2">Chargement...</p>
   </div>
 
-  <!-- Empty State -->
   <div *ngIf="!loading && products.length === 0" class="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
     <i class="fas fa-box text-4xl text-gray-300 mb-4"></i>
     <p class="text-gray-500">Aucun produit trouvé</p>
   </div>
 
-  <!-- Products Table -->
   <div *ngIf="!loading && products.length > 0" class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
     <div class="px-6 py-4 border-b border-gray-200">
       <h4 class="text-lg font-medium text-gray-900">Liste des Produits</h4>
@@ -168,18 +162,18 @@
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
         <tr *ngFor="let product of products" class="hover:bg-gray-50">
-          <!-- Produit -->
+          <!-- Produit avec imageUrl -->
           <td class="px-6 py-4 whitespace-nowrap">
             <div class="flex items-center">
               <div class="flex-shrink-0 h-12 w-12">
                 <img
-                  *ngIf="productService.getImageUrl(product.image)"
-                  [src]="productService.getImageUrl(product.image)"
+                  *ngIf="product.imageUrl"
+                  [src]="product.imageUrl"
                   [alt]="product.name"
                   class="h-12 w-12 rounded-lg object-cover border border-gray-200"
                   (error)="onImageError($event)"
                 >
-                <div *ngIf="!productService.getImageUrl(product.image)"
+                <div *ngIf="!product.imageUrl"
                      class="h-12 w-12 rounded-lg bg-gray-100 flex items-center justify-center border border-gray-200">
                   <i class="fas fa-image text-gray-400"></i>
                 </div>
@@ -191,39 +185,34 @@
             </div>
           </td>
 
-          <!-- Catégorie -->
           <td class="px-6 py-4 whitespace-nowrap">
-              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
-                {{ getCategoryName(product.category_id) }}
-              </span>
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+              {{ getCategoryName(product.category_id) }}
+            </span>
           </td>
 
-          <!-- Prix -->
           <td class="px-6 py-4 whitespace-nowrap">
             <div class="text-sm font-semibold text-gray-900">
               {{ product.price | number:'1.0-2' }} XOF
             </div>
           </td>
 
-          <!-- Stock -->
           <td class="px-6 py-4 whitespace-nowrap">
             <div class="flex items-center space-x-2">
               <span class="text-sm text-gray-900">{{ product.stock_quantity }}</span>
               <span [ngClass]="getStockStatusClass(product.stock_quantity)"
                     class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium">
-                  {{ getStockStatus(product.stock_quantity) }}
-                </span>
+                {{ getStockStatus(product.stock_quantity) }}
+              </span>
             </div>
           </td>
 
-          <!-- Description -->
           <td class="px-6 py-4 max-w-xs">
             <div class="text-sm text-gray-900 truncate" [title]="product.description || ''">
               {{ product.description || '-' }}
             </div>
           </td>
 
-          <!-- Actions -->
           <td class="px-6 py-4 whitespace-nowrap text-right">
             <div class="flex items-center justify-end space-x-1">
               <button
@@ -444,13 +433,13 @@
         <div>
           <div class="aspect-square bg-gray-100 rounded-lg overflow-hidden">
             <img
-              *ngIf="productService.getImageUrl(currentProduct.image)"
-              [src]="productService.getImageUrl(currentProduct.image)"
+              *ngIf="currentProduct.imageUrl"
+              [src]="currentProduct.imageUrl"
               [alt]="currentProduct.name"
               class="w-full h-full object-cover"
               (error)="onImageError($event)"
             >
-            <div *ngIf="!productService.getImageUrl(currentProduct.image)" class="w-full h-full flex items-center justify-center">
+            <div *ngIf="!currentProduct.imageUrl" class="w-full h-full flex items-center justify-center">
               <i class="fas fa-image text-6xl text-gray-300"></i>
             </div>
           </div>
