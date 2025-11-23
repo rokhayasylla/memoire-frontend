@@ -9,9 +9,14 @@ import { Product, CreateProductRequest, UpdateProductRequest } from '../models/p
 })
 export class ProductService {
   private readonly apiUrl = environment.ApiUrl;
-  private readonly baseUrl = 'https://memoire-backend-main-w7xm0f.laravel.cloud';
+  // Dériver baseUrl de apiUrl au lieu de coder en dur
+  private readonly baseUrl = environment.ApiUrl.replace('/api', '');
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
+    console.log('ProductService initialized');
+    console.log('API URL:', this.apiUrl);
+    console.log('Base URL:', this.baseUrl);
+  }
 
   // Getter pour accéder à l'apiUrl depuis le composant
   get baseApiUrl(): string {
@@ -20,20 +25,21 @@ export class ProductService {
 
   // Méthode pour construire l'URL complète des images
   getImageUrl(imagePath: string | null | undefined): string {
-    if (!imagePath) {
-      return 'assets/images/placeholder.jpg'; // Image par défaut
-    }
+  if (!imagePath) {
+    return 'assets/images/placeholder.svg'; // Utilisez .svg
+  }
 
-    // Si c'est déjà une URL complète, la retourner telle quelle
+    // Cas 2: C'est déjà une URL complète (retournée par l'API dans imageUrl)
     if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+      console.log('Using full URL:', imagePath);
       return imagePath;
     }
 
-    // Nettoyer le chemin (enlever les slashes en début)
+    // Cas 3: C'est un chemin relatif (ex: "images/filename.jpg")
     const cleanPath = imagePath.replace(/^\/+/, '');
-
-    // Construire l'URL complète
-    return `${this.baseUrl}/storage/${cleanPath}`;
+    const fullUrl = `${this.baseUrl}/storage/${cleanPath}`;
+    console.log('Constructed URL:', fullUrl);
+    return fullUrl;
   }
 
   getProducts(): Observable<Product[]> {
@@ -65,7 +71,6 @@ export class ProductService {
   updateProduct(id: number, product: UpdateProductRequest): Observable<Product> {
     const formData = new FormData();
 
-    // Ajouter tous les champs, même s'ils sont vides (sauf image)
     formData.append('name', product.name || '');
     formData.append('price', (product.price || 0).toString());
     formData.append('stock_quantity', (product.stock_quantity || 0).toString());
@@ -73,7 +78,6 @@ export class ProductService {
     formData.append('description', product.description || '');
     formData.append('allergens', product.allergens || '');
 
-    // Ajouter l'image seulement si elle est fournie
     if (product.image) {
       formData.append('image', product.image);
     }
