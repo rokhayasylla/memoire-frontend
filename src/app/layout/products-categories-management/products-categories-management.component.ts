@@ -42,7 +42,7 @@ export class ProductsCategoriesManagementComponent implements OnInit {
 
   constructor(
     private categoryService: CategoryService,
-    private productService: ProductService
+    public productService: ProductService
   ) {}
 
   ngOnInit(): void {

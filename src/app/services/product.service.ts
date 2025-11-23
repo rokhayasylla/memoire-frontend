@@ -9,7 +9,6 @@ import { Product, CreateProductRequest, UpdateProductRequest } from '../models/p
 })
 export class ProductService {
   private readonly apiUrl = environment.ApiUrl;
-  // Dériver baseUrl de apiUrl au lieu de coder en dur
   private readonly baseUrl = environment.ApiUrl.replace('/api', '');
 
   constructor(private http: HttpClient) {
@@ -18,27 +17,35 @@ export class ProductService {
     console.log('Base URL:', this.baseUrl);
   }
 
-  // Getter pour accéder à l'apiUrl depuis le composant
   get baseApiUrl(): string {
     return this.apiUrl;
   }
 
-  // Méthode pour construire l'URL complète des images
+  /**
+   * Construire l'URL complète de l'image
+   * Compatible avec imageUrl (URL complète) ou image (nom de fichier seulement)
+   */
   getImageUrl(imagePath: string | null | undefined): string {
-  if (!imagePath) {
-    return 'assets/images/placeholder.svg'; // Utilisez .svg
-  }
+    if (!imagePath) {
+      return 'assets/images/placeholder.svg';
+    }
 
-    // Cas 2: C'est déjà une URL complète (retournée par l'API dans imageUrl)
+    // Si c'est déjà une URL complète (imageUrl du backend), la retourner
     if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
-      console.log('Using full URL:', imagePath);
       return imagePath;
     }
 
-    // Cas 3: C'est un chemin relatif (ex: "images/filename.jpg")
-    const cleanPath = imagePath.replace(/^\/+/, '');
+    // Sinon, construire l'URL à partir du nom de fichier
+    // Enlever les slashes au début
+    let cleanPath = imagePath.replace(/^\/+/, '');
+    
+    // Si le chemin ne commence pas par "images/", l'ajouter
+    if (!cleanPath.startsWith('images/')) {
+      cleanPath = 'images/' + cleanPath;
+    }
+
+    // Construire l'URL complète
     const fullUrl = `${this.baseUrl}/storage/${cleanPath}`;
-    console.log('Constructed URL:', fullUrl);
     return fullUrl;
   }
 
@@ -82,7 +89,6 @@ export class ProductService {
       formData.append('image', product.image);
     }
 
-    // Pour Laravel, on doit simuler une requête PUT avec _method
     formData.append('_method', 'PUT');
 
     return this.http.post<Product>(`${this.apiUrl}/products/${id}`, formData);
