@@ -11,6 +11,8 @@ import { ProductService } from '../../services/product.service';
 })
 export class ProductsCategoriesManagementComponent implements OnInit {
   activeTab: string = 'categories';
+  readonly placeholderImage = 'assets/images/placeholder.svg';
+
 
   // Categories
   categories: Category[] = [];
@@ -355,6 +357,7 @@ export class ProductsCategoriesManagementComponent implements OnInit {
   }
 
   onImageError(event: any): void {
-    event.target.src = 'assets/images/placeholder.jpg';
-  }
+  event.target.src = 'assets/images/placeholder.svg';   // ✅ nouvelle ligne
+}
+
 }
